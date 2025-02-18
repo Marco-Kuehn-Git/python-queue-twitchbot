@@ -7,7 +7,7 @@ class QueueManager(QWidget):
         super().__init__()
         self.setWindowTitle("Twitch Queue Manager")
         self.setGeometry(100, 100, 900, 600)
-        #self.setStyleSheet(self.get_styles())
+        self.setStyleSheet(self.get_styles())
 
         # Layout
         main_layout = QHBoxLayout()
@@ -19,7 +19,7 @@ class QueueManager(QWidget):
         queue_layout = QVBoxLayout()
         self.queue_list = QListWidget()
         self.queue_list.setObjectName("queueList")
-        self.queue_list.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)  # Ensure it expands
+        self.queue_list.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         queue_layout.addWidget(self.queue_list)
         self.queue_box.setLayout(queue_layout)
         
@@ -30,7 +30,7 @@ class QueueManager(QWidget):
         selected_layout = QVBoxLayout()
         self.selected_list = QListWidget()
         self.selected_list.setObjectName("selectedList")
-        self.selected_list.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)  # Ensure it expands
+        self.selected_list.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         selected_layout.addWidget(self.selected_list)
         self.selected_box.setLayout(selected_layout)
         
@@ -59,7 +59,7 @@ class QueueManager(QWidget):
         
         move_button = QPushButton("⮞")
         move_button.setToolTip("Move to selected")
-        move_button.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Fixed)  # Ensure button size is reasonable
+        move_button.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Fixed)
         
         item_layout.addWidget(name_label)
         item_layout.addWidget(details_label)
@@ -140,7 +140,6 @@ class QueueManager(QWidget):
             QLabel#nameLabel {
                 font-weight: bold;
                 color: #FFFFFF; 
-                max-width: 150px;
             }
 
             QLabel#detailsLabel {
@@ -169,12 +168,6 @@ class QueueManager(QWidget):
             QPushButton[disabled="true"] {
                 background: #666;
                 color: #aaa;
-            }
-
-            QListWidget::verticalScrollBar {
-                background: #40444b;
-                width: 10px;
-                margin: 0px;
             }
 
             QListWidget::verticalScrollBar::handle {
