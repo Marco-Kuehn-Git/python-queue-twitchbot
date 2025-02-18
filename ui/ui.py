@@ -7,7 +7,7 @@ class QueueManager(QWidget):
         super().__init__()
         self.setWindowTitle("Twitch Queue Manager")
         self.setGeometry(100, 100, 900, 600)
-        self.setStyleSheet(self.get_styles())
+        #self.setStyleSheet(self.get_styles())
 
         # Layout
         main_layout = QHBoxLayout()
@@ -100,61 +100,58 @@ class QueueManager(QWidget):
     def get_styles(self):
         return """
             QWidget {
-                background-color: #18181b; /* Dark background */
-                color: #E9E9E9; /* Light text color */
+                background-color: #18181b; 
+                color: #E9E9E9;
                 font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
                 font-size: 14px;
             }
 
             QGroupBox {
-                background: #292b2f; /* Slightly lighter background for group boxes */
+                background: #292b2f; 
                 border-radius: 8px;
                 padding: 15px;
                 margin: 10px;
                 font-size: 18px;
                 font-weight: bold;
                 text-align: center;
-                border: 2px solid #3a3a3c; /* Subtle border */
+                border: 2px solid #3a3a3c; 
             }
 
             QLabel {
                 font-size: 16px;
                 font-weight: bold;
-                color: #E9E9E9; /* Light label color */
+                color: #E9E9E9; 
             }
 
             QListWidget {
-                background: #40444b; /* Darker background for the list */
+                background: #40444b; 
                 border-radius: 6px;
                 padding: 10px;
                 margin-top: 10px;
-                color: #E9E9E9; /* Text color in the list */
+                color: #E9E9E9; 
                 border: none;
             }
 
             QFrame#queueItem, QFrame#selectedItem {
-                background: #50555c; /* Slightly lighter for item frames */
-                padding: 10px;
-                margin: 5px 0;
                 border-radius: 6px;
-                border: 1px solid #3a3a3c; /* Border for items */
+                border: 1px solid #3a3a3c; 
             }
 
             QLabel#nameLabel {
                 font-weight: bold;
-                color: #FFFFFF; /* Bright white for name labels */
-                max-width: 150px; /* Prevent text overflow */
+                color: #FFFFFF; 
+                max-width: 150px;
             }
 
             QLabel#detailsLabel {
-                color: #939393; /* Dim text color for details */
+                color: #939393;
                 font-size: 14px;
                 text-align: right;
             }
 
             QPushButton {
-                background: #5865f2; /* Bright blue for buttons */
-                color: #E9E9E9; /* Button text color */
+                background: #5865f2;
+                color: #E9E9E9; 
                 border: none;
                 padding: 6px 12px;
                 border-radius: 4px;
@@ -162,19 +159,18 @@ class QueueManager(QWidget):
             }
 
             QPushButton:hover {
-                background: #4752c4; /* Darker blue when hovering */
+                background: #4752c4;
             }
 
             QPushButton:pressed {
-                background: #3b43a1; /* Even darker when pressed */
+                background: #3b43a1; 
             }
 
             QPushButton[disabled="true"] {
-                background: #666; /* Disabled button color */
+                background: #666;
                 color: #aaa;
             }
 
-            /* Scrollbar Styles */
             QListWidget::verticalScrollBar {
                 background: #40444b;
                 width: 10px;
@@ -190,10 +186,9 @@ class QueueManager(QWidget):
                 background: #888;
             }
 
-            /* Add custom focus styles for accessibility */
             QPushButton:focus {
                 outline: none;
-                border: 2px solid #5865f2; /* Highlight button with blue when focused */
+                border: 2px solid #5865f2;
             }
         """
 
