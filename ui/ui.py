@@ -5,8 +5,8 @@ import sys
 class QueueManager(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Twitch Queue Manager")
-        self.setGeometry(100, 100, 900, 600)
+        self.setWindowTitle("Queue Manager")
+        self.setGeometry(100, 60, 1100, 700)
         self.setStyleSheet(self.get_styles())
 
         # Layout
@@ -24,7 +24,7 @@ class QueueManager(QWidget):
         self.queue_box.setLayout(queue_layout)
         
         # Selected Players Box
-        self.selected_box = QGroupBox("Selected Players")
+        self.selected_box = QGroupBox("Up Next")
         self.selected_box.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.selected_box.setObjectName("selectedBox")
         selected_layout = QVBoxLayout()
@@ -54,10 +54,11 @@ class QueueManager(QWidget):
         name_label.setObjectName("nameLabel")
         name_label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         
-        details_label = QLabel(f"{tier} | Games: {games}")
+        details_label = QLabel(f"{tier} | Queued: {games}")
         details_label.setObjectName("detailsLabel")
         
         move_button = QPushButton("⮞")
+        move_button.setObjectName("mooveButton")
         move_button.setToolTip("Move to selected")
         move_button.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Fixed)
         
@@ -84,7 +85,7 @@ class QueueManager(QWidget):
         back_button.setToolTip("Move back to queue")
         back_button.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Fixed)
         
-        remove_button = QPushButton("✕")
+        remove_button = QPushButton("X")
         remove_button.setToolTip("Remove from list")
         remove_button.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Fixed)
         
@@ -157,26 +158,16 @@ class QueueManager(QWidget):
                 font-size: 16px;
             }
 
+            QPushButton#mooveButton{
+                margin-left: 15px;
+            }
+
             QPushButton:hover {
                 background: #4752c4;
             }
 
             QPushButton:pressed {
                 background: #3b43a1; 
-            }
-
-            QPushButton[disabled="true"] {
-                background: #666;
-                color: #aaa;
-            }
-
-            QListWidget::verticalScrollBar::handle {
-                background: #666;
-                border-radius: 4px;
-            }
-
-            QListWidget::verticalScrollBar::handle:hover {
-                background: #888;
             }
 
             QPushButton:focus {
