@@ -49,8 +49,8 @@ class QueueManager(QWidget):
         self.setLayout(main_layout)
 
 
+    # Add a user to one of the lists (queue or selected)
     def add_to_list(self, list_widget, name, tier, games, move_callback):
-        """Add user to a list (queue or selected)."""
         item_frame = QFrame()
         item_layout = QHBoxLayout()
         item_frame.setLayout(item_layout)
@@ -86,20 +86,20 @@ class QueueManager(QWidget):
         list_widget.setItemWidget(list_item, item_frame)
 
 
+    # Refresh queue list in ui
     def refresh_queue(self, queue):
-        """Clear and update queue list in UI."""
         self.queue_list.clear()
-        for name, tier, games in queue:
+        for name, tier, games, _ in queue:
             self.add_to_list(self.queue_list, name, tier, games, self.move_to_selected)
 
+    # Refresh selected list in ui
     def refresh_selected(self, selected):
-        """Clear and update selected list in UI."""
         self.selected_list.clear()
-        for name, tier, games in selected:
+        for name, tier, games, _ in selected:
             self.add_to_list(self.selected_list, name, tier, games, self.move_back_to_queue)
 
+    # Move user from queue to 'next up'
     def move_to_selected(self, name):
-        """Move user from queue to selected."""
         user = next((user for user in self.controller.queue if user[0] == name), None)
         if user:
             self.controller.queue.remove(user)
@@ -107,18 +107,20 @@ class QueueManager(QWidget):
             self.controller.update_queue(self.controller.queue)
             self.controller.update_selected(self.controller.selected)
 
+    # Move user back to queue inserting them into the correct position
     def move_back_to_queue(self, name):
-        """Move user back from selected to queue."""
         user = next((user for user in self.controller.selected if user[0] == name), None)
         if user:
             self.controller.selected.remove(user)
             self.controller.queue.append(user)
-            self.controller.queue.sort(key=lambda x: (x[2], -x[1]))
+    
+            self.controller.queue.sort(key=lambda x: (x[2], -x[1], x[3]))
+    
             self.controller.update_queue(self.controller.queue)
             self.controller.update_selected(self.controller.selected)
 
+    # Remove user from selected and increase their queue count
     def remove_from_selected(self, name):
-        """Remove user from selected and increase their queue count."""
         user = next((user for user in self.controller.selected if user[0] == name), None)
         if user:
             self.controller.selected.remove(user)
@@ -126,7 +128,7 @@ class QueueManager(QWidget):
             self.controller.increase_queue_count(name)
 
 
-
+    # Style for the ui
     def get_styles(self):
         return """
             QWidget {

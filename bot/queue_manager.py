@@ -1,4 +1,6 @@
+from datetime import datetime
 from twitchio.ext import commands
+
 from bot.config import TWITCH_OAUTH_TOKEN, TWITCH_CHANNEL
 
 class QueueBot(commands.Bot):
@@ -26,6 +28,8 @@ class QueueBot(commands.Bot):
 
         # Get previous queue count from the controller, default to 0
         times_queued = self.controller.get_queue_count(username)
+        # Get timestamp for when user joined the queue
+        join_time = datetime.now().timestamp()
 
         # Prevent duplicate queue entries
         if any(user[0] == username for user in self.queue):
@@ -33,7 +37,7 @@ class QueueBot(commands.Bot):
             return
 
         # Add user to queue, sort and update the ui
-        self.queue.append((username, sub_tier, times_queued))
+        self.queue.append((username, sub_tier, times_queued, join_time))
         self.sort_queue()
         self.controller.update_queue(self.queue)
 
@@ -57,4 +61,4 @@ class QueueBot(commands.Bot):
 
     # Sorts the queue by: (times queued ascending, sub tier descending)
     def sort_queue(self):
-        self.queue.sort(key=lambda x: (x[2], -x[1]))
+        self.queue.sort(key=lambda x: (x[2], -x[1], x[3]))
