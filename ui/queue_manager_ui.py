@@ -113,6 +113,7 @@ class QueueManager(QWidget):
         if user:
             self.controller.selected.remove(user)
             self.controller.queue.append(user)
+            self.controller.queue.sort(key=lambda x: (x[2], -x[1]))
             self.controller.update_queue(self.controller.queue)
             self.controller.update_selected(self.controller.selected)
 
