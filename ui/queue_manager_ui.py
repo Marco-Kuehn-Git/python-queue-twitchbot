@@ -1,13 +1,20 @@
-from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QListWidget, QPushButton, QHBoxLayout, QListWidgetItem, QGroupBox, QFrame, QSizePolicy
+from PyQt6.QtWidgets import (
+    QWidget, QVBoxLayout, QLabel, QListWidget, QPushButton, 
+    QHBoxLayout, QListWidgetItem, QGroupBox, QFrame, QSizePolicy
+)
 from PyQt6.QtCore import Qt
-import sys
+from .queue_controller import QueueController
 
 class QueueManager(QWidget):
-    def __init__(self):
+    def __init__(self, controller: QueueController):
         super().__init__()
         self.setWindowTitle("Queue Manager")
         self.setGeometry(100, 60, 1100, 700)
         self.setStyleSheet(self.get_styles())
+
+        self.controller = controller
+        self.controller.queue_updated.connect(self.refresh_queue)
+        self.controller.selected_updated.connect(self.refresh_selected)
 
         # Layout
         main_layout = QHBoxLayout()
@@ -22,81 +29,102 @@ class QueueManager(QWidget):
         self.queue_list.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         queue_layout.addWidget(self.queue_list)
         self.queue_box.setLayout(queue_layout)
-        
+
+
         # Selected Players Box
         self.selected_box = QGroupBox("Up Next")
         self.selected_box.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.selected_box.setObjectName("selectedBox")
         selected_layout = QVBoxLayout()
+
         self.selected_list = QListWidget()
         self.selected_list.setObjectName("selectedList")
         self.selected_list.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+
         selected_layout.addWidget(self.selected_list)
         self.selected_box.setLayout(selected_layout)
         
-        # Add to main layout
         main_layout.addWidget(self.queue_box)
         main_layout.addWidget(self.selected_box)
         self.setLayout(main_layout)
 
-        # Sample data
-        self.add_to_queue("Viewer1", "Tier 1", 0)
-        self.add_to_queue("Viewer2", "Tier 0", 1)
-        self.add_to_selected("Viewer3")
 
-    def add_to_queue(self, name, tier, games):
+    def add_to_list(self, list_widget, name, tier, games, move_callback):
+        """Add user to a list (queue or selected)."""
         item_frame = QFrame()
         item_layout = QHBoxLayout()
         item_frame.setLayout(item_layout)
-        item_frame.setObjectName("queueItem")
         
         name_label = QLabel(name)
         name_label.setObjectName("nameLabel")
         name_label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
-        
-        details_label = QLabel(f"{tier} | Queued: {games}")
+
+        details_label = QLabel(f"Tier {tier} | Queued: {games}")
         details_label.setObjectName("detailsLabel")
-        
-        move_button = QPushButton("⮞")
-        move_button.setObjectName("mooveButton")
-        move_button.setToolTip("Move to selected")
-        move_button.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Fixed)
-        
-        item_layout.addWidget(name_label)
-        item_layout.addWidget(details_label)
-        item_layout.addWidget(move_button)
-        
-        list_item = QListWidgetItem()
-        list_item.setSizeHint(item_frame.sizeHint())
-        self.queue_list.addItem(list_item)
-        self.queue_list.setItemWidget(list_item, item_frame)
 
-    def add_to_selected(self, name):
-        item_frame = QFrame()
-        item_layout = QHBoxLayout()
-        item_frame.setLayout(item_layout)
-        item_frame.setObjectName("selectedItem")
-        
-        name_label = QLabel(name)
-        name_label.setObjectName("nameLabel")
-        name_label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
-        
-        back_button = QPushButton("⮜")
-        back_button.setToolTip("Move back to queue")
-        back_button.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Fixed)
-        
+        move_button = QPushButton("⮞" if list_widget == self.queue_list else "⮜")
+        move_button.setObjectName("moveButton")
+        move_button.setToolTip("Move to selected" if list_widget == self.queue_list else "Move back to queue")
+        move_button.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Fixed)
+        move_button.clicked.connect(lambda: move_callback(name))
+
         remove_button = QPushButton("X")
         remove_button.setToolTip("Remove from list")
         remove_button.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Fixed)
-        
+        remove_button.clicked.connect(lambda: self.remove_from_selected(name))
+
         item_layout.addWidget(name_label)
-        item_layout.addWidget(back_button)
-        item_layout.addWidget(remove_button)
-        
+        item_layout.addWidget(details_label)
+        item_layout.addWidget(move_button)
+
+        if list_widget == self.selected_list:
+            item_layout.addWidget(remove_button)
+
         list_item = QListWidgetItem()
         list_item.setSizeHint(item_frame.sizeHint())
-        self.selected_list.addItem(list_item)
-        self.selected_list.setItemWidget(list_item, item_frame)
+        list_widget.addItem(list_item)
+        list_widget.setItemWidget(list_item, item_frame)
+
+
+    def refresh_queue(self, queue):
+        """Clear and update queue list in UI."""
+        self.queue_list.clear()
+        for name, tier, games in queue:
+            self.add_to_list(self.queue_list, name, tier, games, self.move_to_selected)
+
+    def refresh_selected(self, selected):
+        """Clear and update selected list in UI."""
+        self.selected_list.clear()
+        for name, tier, games in selected:
+            self.add_to_list(self.selected_list, name, tier, games, self.move_back_to_queue)
+
+    def move_to_selected(self, name):
+        """Move user from queue to selected."""
+        user = next((user for user in self.controller.queue if user[0] == name), None)
+        if user:
+            self.controller.queue.remove(user)
+            self.controller.selected.append(user)
+            self.controller.update_queue(self.controller.queue)
+            self.controller.update_selected(self.controller.selected)
+
+    def move_back_to_queue(self, name):
+        """Move user back from selected to queue."""
+        user = next((user for user in self.controller.selected if user[0] == name), None)
+        if user:
+            self.controller.selected.remove(user)
+            self.controller.queue.append(user)
+            self.controller.update_queue(self.controller.queue)
+            self.controller.update_selected(self.controller.selected)
+
+    def remove_from_selected(self, name):
+        """Remove user from selected and increase their queue count."""
+        user = next((user for user in self.controller.selected if user[0] == name), None)
+        if user:
+            self.controller.selected.remove(user)
+            self.controller.update_selected(self.controller.selected)
+            self.controller.increase_queue_count(name)
+
+
 
     def get_styles(self):
         return """
@@ -175,10 +203,3 @@ class QueueManager(QWidget):
                 border: 2px solid #5865f2;
             }
         """
-
-
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    window = QueueManager()
-    window.show()
-    sys.exit(app.exec())
