@@ -1,8 +1,10 @@
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QListWidget, QPushButton, 
-    QHBoxLayout, QListWidgetItem, QGroupBox, QFrame, QSizePolicy
+    QHBoxLayout, QListWidgetItem, QGroupBox, QFrame, QSizePolicy,
 )
 from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QPixmap, QColor, QPainter
+
 from .queue_controller import QueueController
 
 class QueueManager(QWidget):
@@ -15,9 +17,26 @@ class QueueManager(QWidget):
         self.controller = controller
         self.controller.queue_updated.connect(self.refresh_queue)
         self.controller.selected_updated.connect(self.refresh_selected)
+        self.controller.connection_status.connect(self.update_status_icon)
 
-        # Layout
-        main_layout = QHBoxLayout()
+        # Status Indicator
+        status_layout = QHBoxLayout()
+        self.status_label = QLabel("Disconnected")
+        self.status_label.setObjectName("statusLabel")
+        
+        self.status_icon = QLabel()
+        self.status_icon.setFixedSize(20, 20)
+        self.update_status_icon(False)
+        
+        status_layout.addWidget(self.status_icon)
+        status_layout.addWidget(self.status_label)
+
+        # Main Layout
+        main_layout = QVBoxLayout()
+        main_layout.addLayout(status_layout)
+
+        # Queue & Selected Players Layout
+        queue_selected_layout = QHBoxLayout()
         
         # Queue Box
         self.queue_box = QGroupBox("Queue")
@@ -30,22 +49,21 @@ class QueueManager(QWidget):
         queue_layout.addWidget(self.queue_list)
         self.queue_box.setLayout(queue_layout)
 
-
         # Selected Players Box
         self.selected_box = QGroupBox("Up Next")
         self.selected_box.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.selected_box.setObjectName("selectedBox")
         selected_layout = QVBoxLayout()
-
         self.selected_list = QListWidget()
         self.selected_list.setObjectName("selectedList")
         self.selected_list.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-
         selected_layout.addWidget(self.selected_list)
         self.selected_box.setLayout(selected_layout)
+
+        queue_selected_layout.addWidget(self.queue_box)
+        queue_selected_layout.addWidget(self.selected_box)
         
-        main_layout.addWidget(self.queue_box)
-        main_layout.addWidget(self.selected_box)
+        main_layout.addLayout(queue_selected_layout)
         self.setLayout(main_layout)
 
 
@@ -85,6 +103,21 @@ class QueueManager(QWidget):
         list_widget.addItem(list_item)
         list_widget.setItemWidget(list_item, item_frame)
 
+    # Updates the status to show if connected or disconnected
+    def update_status_icon(self, connected: bool):
+        color = QColor("#28a745") if connected else QColor("#dc3545")
+        text = "Connected" if connected else "Disconnected"
+
+        pixmap = QPixmap(20, 20)
+        pixmap.fill(QColor("transparent"))
+        painter = QPainter(pixmap)
+        painter.setBrush(color)
+        painter.setPen(color)
+        painter.drawEllipse(0, 0, 18, 18)
+        painter.end()
+
+        self.status_icon.setPixmap(pixmap)
+        self.status_label.setText(text)
 
     # Refresh queue list in ui
     def refresh_queue(self, queue):

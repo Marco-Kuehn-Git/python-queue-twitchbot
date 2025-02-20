@@ -5,6 +5,7 @@ class QueueController(QObject):
     # Signals for UI updates
     queue_updated = pyqtSignal(list)
     selected_updated = pyqtSignal(list)
+    connection_status = pyqtSignal(bool)
 
     def __init__(self):
         super().__init__()

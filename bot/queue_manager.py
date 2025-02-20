@@ -15,6 +15,11 @@ class QueueBot(commands.Bot):
 
     async def event_ready(self):
         print(f"Bot is online as {self.nick}")
+        self.controller.connection_status.emit(True)
+
+    async def event_disconnect(self):
+        print("Bot disconnected!")
+        self.controller.ui.connection_status_changed.emit(False)
 
     async def event_message(self, message):
         if message.echo:
