@@ -8,3 +8,6 @@ logs/
 *.log
 
 config.json
+dist/
+build/
+*.spec
