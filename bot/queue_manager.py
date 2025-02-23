@@ -98,8 +98,13 @@ class QueueBot(commands.Bot):
 
     # Returns the sub tier (0 = no sub, 1 = tier 1, etc.)
     def get_sub_tier(self, user):
-        return user.subscription_tier // 1000 if user.is_subscriber else 0
+        if user.is_subscriber:
+            sub_tier_unclean = int(user.badges.get("subscriber"))
+            sub_tier_clean = sub_tier_unclean // 1000
+            return sub_tier_clean
+        else:
+            return 0
 
-    # Sorts the queue by: (times queued ascending, sub tier descending)
+    # Sorts the queue by: (times queued ascending, sub tier descending, first joined)
     def sort_queue(self):
         self.queue.sort(key=lambda x: (x[2], -x[1], x[3]))
