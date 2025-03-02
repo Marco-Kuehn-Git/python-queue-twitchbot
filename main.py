@@ -1,12 +1,11 @@
 import sys
 import threading
 from PyQt6.QtWidgets import QApplication
-from ui.queue_manager_ui import QueueManager
-from ui.queue_controller import QueueController
-from bot.queue_manager import QueueBot
+from ui.ui import QueueManager
+from ui.controller import QueueController
+from bot.bot_twitch import QueueBot
 
 def start_bot(bot):
-    """Runs the bot in a separate thread."""
     bot.run()
 
 if __name__ == "__main__":

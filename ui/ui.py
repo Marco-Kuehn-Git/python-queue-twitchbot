@@ -5,7 +5,7 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QPixmap, QColor, QPainter
 
-from .queue_controller import QueueController
+from .controller import QueueController
 
 class QueueManager(QWidget):
     def __init__(self, controller: QueueController):
