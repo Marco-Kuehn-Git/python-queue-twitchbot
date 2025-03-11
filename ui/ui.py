@@ -4,10 +4,9 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QPixmap, QColor, QPainter
-
 from .controller import QueueController
 
-class QueueManager(QWidget):
+class UI(QWidget):
     def __init__(self, controller: QueueController):
         super().__init__()
         self.setWindowTitle("Queue Manager")
@@ -120,45 +119,31 @@ class QueueManager(QWidget):
         self.status_label.setText(text)
 
     # Refresh queue list in ui
-    def refresh_queue(self, queue):
+    def refresh_queue(self):
         self.queue_list.clear()
-        for name, tier, games, _ in queue:
+        for name, tier, games, _ in self.controller.queue_manager.get_queue():
             self.add_to_list(self.queue_list, name, tier, games, self.move_to_selected)
 
     # Refresh selected list in ui
-    def refresh_selected(self, selected):
+    def refresh_selected(self):
         self.selected_list.clear()
-        for name, tier, games, _ in selected:
+        for name, tier, games, _ in self.controller.queue_manager.get_selected():
             self.add_to_list(self.selected_list, name, tier, games, self.move_back_to_queue)
-
     # Move user from queue to 'next up'
     def move_to_selected(self, name):
-        user = next((user for user in self.controller.queue if user[0] == name), None)
-        if user:
-            self.controller.queue.remove(user)
-            self.controller.selected.append(user)
-            self.controller.update_queue(self.controller.queue)
-            self.controller.update_selected(self.controller.selected)
+        if self.controller.queue_manager.move_to_selected(name):
+            self.controller.update_ui()
 
     # Move user back to queue inserting them into the correct position
     def move_back_to_queue(self, name):
-        user = next((user for user in self.controller.selected if user[0] == name), None)
-        if user:
-            self.controller.selected.remove(user)
-            self.controller.queue.append(user)
-    
-            self.controller.queue.sort(key=lambda x: (x[2], -x[1], x[3]))
-    
-            self.controller.update_queue(self.controller.queue)
-            self.controller.update_selected(self.controller.selected)
+        if self.controller.queue_manager.move_back_to_queue(name):
+            self.controller.update_ui()
 
     # Remove user from selected and increase their queue count
     def remove_from_selected(self, name):
-        user = next((user for user in self.controller.selected if user[0] == name), None)
-        if user:
-            self.controller.selected.remove(user)
-            self.controller.update_selected(self.controller.selected)
+        if self.controller.queue_manager.remove_user(name):
             self.controller.increase_queue_count(name)
+            self.controller.update_ui()
 
 
     # Style for the ui

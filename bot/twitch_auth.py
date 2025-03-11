@@ -7,7 +7,7 @@ import threading
 import time
 from urllib.parse import urlparse, parse_qs
 
-from config import (
+from bot.config import (
     TWITCH_CLIENT_ID, TWITCH_CLIENT_SECRET, TWITCH_OAUTH_TOKEN, TWITCH_REFRESH_TOKEN,
     TWITCH_APP_REDIRECT_URI, TWITCH_SCOPES
 )
