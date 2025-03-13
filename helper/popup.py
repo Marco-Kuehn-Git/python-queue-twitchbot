@@ -2,26 +2,21 @@ import tkinter as tk
 from tkinter import messagebox
 import sys
 
-# Info popup
-def show_info_popup(title, message):
+def show_popup(type, title, message):
     root = tk.Tk()
     root.withdraw()
-    messagebox.showinfo(title, message)
+    
+    types = {
+        "info": messagebox.showinfo,
+        "warning": messagebox.showwarning,
+        "error": messagebox.showerror
+    }
+    
+    if type in types:
+        types[type](title, message)
+    else:
+        raise ValueError("Invalid popup type. Use 'info', 'warning', or 'error'.")
+    
     root.destroy()
     sys.exit(1)
-
-# Warning popup
-def show_warning_popup(title, message):
-    root = tk.Tk()
-    root.withdraw()
-    messagebox.showwarning(title, message)
-    root.destroy()
-    sys.exit(1)
-
-# Error popup
-def show_error_popup(title, message):
-    root = tk.Tk()
-    root.withdraw()
-    messagebox.showerror(title, message)
-    root.destroy()
-    sys.exit(1)
+    

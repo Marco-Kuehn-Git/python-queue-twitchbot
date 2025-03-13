@@ -1,7 +1,7 @@
 from datetime import datetime
 from twitchio.ext import commands
 
-from helper.popup import show_info_popup
+from helper.popup import show_popup
 from bot.twitch_auth import TwitchAuthHandler
 from bot.config import TWITCH_OAUTH_TOKEN, TWITCH_CHANNEL
 
@@ -87,7 +87,9 @@ class TwitchBot(commands.Bot):
                 self._http.token = auth_handler.oauth_token
                 self.token = auth_handler.oauth_token
                 print("Token refreshed successfully. Please restart the application.")
-                show_info_popup("Token Refresh", "A refresh of tokens was needed.\n Please restart the application.")
+                show_popup("info", "Token Refresh", 
+                           "The tokens had to be automatically refreshed.\n"
+                           "Please restart the application for the changes to take effect.")
             else:
                 raise e
 
