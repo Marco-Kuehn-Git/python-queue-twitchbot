@@ -22,13 +22,25 @@ class UI(QWidget):
         status_layout = QHBoxLayout()
         self.status_label = QLabel("Disconnected")
         self.status_label.setObjectName("statusLabel")
-        
+
         self.status_icon = QLabel()
         self.status_icon.setFixedSize(20, 20)
         self.update_status_icon(False)
-        
+
+        # Twitch auth button
+        self.twitch_auth_button = QPushButton("Connect Twitch")
+        self.twitch_auth_button.setToolTip("Click to authorize Twitch")
+        self.twitch_auth_button.clicked.connect(self.authorize_twitch)
+
+        # Youtube auth button
+        self.youtube_auth_button = QPushButton("Connect YouTube")
+        self.youtube_auth_button.setToolTip("Click to authorize Youtube")
+        self.youtube_auth_button.clicked.connect(self.authorize_youtube)
+
         status_layout.addWidget(self.status_icon)
         status_layout.addWidget(self.status_label)
+        status_layout.addWidget(self.twitch_auth_button)
+        status_layout.addWidget(self.youtube_auth_button)
 
         # Main Layout
         main_layout = QVBoxLayout()
@@ -117,6 +129,20 @@ class UI(QWidget):
 
         self.status_icon.setPixmap(pixmap)
         self.status_label.setText(text)
+
+    def authorize_twitch(self):
+        import threading
+        from bot.twitch_auth import TwitchAuthHandler
+
+        def auth_thread():
+            print("Starting Twitch authorization via UI button...")
+            auth_handler = TwitchAuthHandler()
+            auth_handler.start_auth() 
+
+        threading.Thread(target=auth_thread, daemon=True).start()
+
+    def authorize_youtube(self):
+        return 0
 
     # Refresh queue list in ui
     def refresh_queue(self):

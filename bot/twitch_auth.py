@@ -135,7 +135,3 @@ class TwitchAuthHandler:
             json.dump(config, file, indent=4)
 
         print("Tokens saved successfully!")
-
-if __name__ == "__main__":
-    auth_handler = TwitchAuthHandler()
-    auth_handler.start_auth()
