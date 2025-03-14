@@ -4,6 +4,7 @@ import time
 import asyncio
 from PyQt6.QtWidgets import QApplication
 
+from helper.popup import show_popup
 from ui.ui import UI
 from ui.controller import QueueController
 from bot.bot_twitch import TwitchBot
@@ -42,6 +43,7 @@ def start_bot_loop(controller, shared_queue_manager):
     else:
         # If we reached 5 restarts, warn the user.
         print("Maximum bot restarts reached. Please restart the application manually.")
+        show_popup("warning", "Restart needed", "Tokens have been refreshed but the bot failed to restart.\nPlease restart the application")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
