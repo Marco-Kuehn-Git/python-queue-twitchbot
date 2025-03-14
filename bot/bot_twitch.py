@@ -1,19 +1,21 @@
 from datetime import datetime
 from twitchio.ext import commands
 
-from helper.popup import show_popup
 from bot.twitch_auth import TwitchAuthHandler
-from bot.config import TWITCH_OAUTH_TOKEN, TWITCH_CHANNEL
+from bot.config import load_config, TWITCH_CHANNEL
 
 class TwitchBot(commands.Bot):
     def __init__(self, controller, queue_manager):
+        config = load_config()
+        token_from_config = config["twitch_oauth_token"]
         super().__init__(
-            token=TWITCH_OAUTH_TOKEN,
+            token=token_from_config,
             prefix="!",
             initial_channels=[TWITCH_CHANNEL]
         )
         self.controller = controller
         self.queue_manager = queue_manager
+        self.should_restart = False
 
     async def event_ready(self):
         print(f"Bot is online as {self.nick}")
@@ -66,30 +68,32 @@ class TwitchBot(commands.Bot):
         else:
             return 0
 
-    # Override the run method to handle token refresh on 401 errors.
+    # Override the run method to handle token refresh on 401
     def run(self):
         try:
             super().run()
         except Exception as e:
             error_str = str(e).lower()
             token_error = False
-            # Check for 401 status or "invalid token" phrases in the error message.
+
             if "401" in error_str or ("invalid" in error_str and "token" in error_str):
                 token_error = True
-            # Additionally, check if the exception type indicates a login failure.
             elif e.__class__.__name__.lower() == "loginfailure":
                 token_error = True
+
             if token_error:
                 print("Detected invalid or expired token. Attempting token refresh...")
                 auth_handler = TwitchAuthHandler()
                 auth_handler.refresh_twitch_token()
-                
+
+                # Update bots token with the new one
                 self._http.token = auth_handler.oauth_token
                 self.token = auth_handler.oauth_token
-                print("Token refreshed successfully. Please restart the application.")
-                show_popup("info", "Token Refresh", 
-                           "The tokens had to be automatically refreshed.\n"
-                           "Please restart the application for the changes to take effect.")
+                print("Token refreshed successfully.")
+
+                # Signal that the bot should restartd
+                self.should_restart = True
+
             else:
                 raise e
 
