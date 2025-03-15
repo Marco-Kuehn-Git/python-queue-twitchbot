@@ -16,13 +16,12 @@ class QueueManager:
 
     # Remove user from queue (Called when user uses !leave)
     def remove_from_queue(self, username):
-        # Only remove the user if they are in the regular queue.
         if any(entry[0] == username for entry in self.queue):
             self.queue = [entry for entry in self.queue if entry[0] != username]
             return True
         return False
 
-    # Remove user from selected. (Called when hitting 'x' on UI)
+    # Remove user from selected. (Called when clicking 'x' on UI)
     def remove_user(self, username):
         for lst in (self.selected):
             if any(entry[0] == username for entry in lst):
@@ -30,11 +29,11 @@ class QueueManager:
                 return True
         return False
 
-    # Sort the queue by (times queued ascending, sub tier descending, join time ascending)
+    # Sort the queue (times queued ascending, sub tier descending, join time ascending)
     def sort_queue(self):
         self.queue.sort(key=lambda x: (x[2], -x[1], x[3]))
 
-    # Moove user from queue to selected list
+    # Move user from queue to selected list
     def move_to_selected(self, username):
         user = next((entry for entry in self.queue if entry[0] == username), None)
         if user:
@@ -43,7 +42,7 @@ class QueueManager:
             return True
         return False
 
-    # Moove user from selected back to queue list
+    # Move user from selected back to queue list
     def move_back_to_queue(self, username):
         user = next((entry for entry in self.selected if entry[0] == username), None)
         if user:
