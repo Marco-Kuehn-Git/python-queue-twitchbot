@@ -62,8 +62,13 @@ class TwitchBot(commands.Bot):
     # Returns the sub tier (0 = no sub, 1 = tier 1, etc.)
     def get_sub_tier(self, user):
         if user.is_subscriber:
+            # Unclean subs are displayed like this (Tier3 9Months: 3009, Tier2 11Months:2011, Tier1 4Months:4)
             sub_tier_unclean = int(user.badges.get("subscriber"))
-            sub_tier_clean = sub_tier_unclean // 1000
+            # Using max() to make sure tier 1 subs actually show up 1
+            sub_tier_clean = max(sub_tier_unclean // 1000, 1)
+            if sub_tier_clean == 0:
+                sub_tier_clean = 1
+            print("Unclean sub tier:", sub_tier_unclean,"Clean sub tier:", sub_tier_clean)
             return sub_tier_clean
         else:
             return 0
