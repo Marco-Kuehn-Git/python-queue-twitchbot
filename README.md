@@ -1,6 +1,8 @@
 # python-queue-twitchbot
 A simple twitch bot written in python that allowes viewers to join a queue. The streamer is able to select veiwers from this queue through a UI.
 
+The viewers are sorted based on times queued, sub tier and time joined.
+
 <br />
 
 Create a config.json file at the same level as main.py
