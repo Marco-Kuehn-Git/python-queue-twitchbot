@@ -32,11 +32,6 @@ class UI(QWidget):
         self.twitch_auth_button.setToolTip("Click to authorize Twitch")
         self.twitch_auth_button.clicked.connect(self.authorize_twitch)
 
-        # Youtube auth button
-        self.youtube_auth_button = QPushButton("Connect YouTube")
-        self.youtube_auth_button.setToolTip("Click to authorize Youtube")
-        self.youtube_auth_button.clicked.connect(self.authorize_youtube)
-
         status_layout.addWidget(self.status_icon)
         status_layout.addWidget(self.status_label)
         status_layout.addWidget(self.twitch_auth_button)
@@ -140,9 +135,6 @@ class UI(QWidget):
             auth_handler.start_auth() 
 
         threading.Thread(target=auth_thread, daemon=True).start()
-
-    def authorize_youtube(self):
-        return 0
 
     # Refresh queue list in ui
     def refresh_queue(self):
