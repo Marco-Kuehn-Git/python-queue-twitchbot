@@ -15,6 +15,8 @@ from bot.config import (
     TWITCH_REFRESH_TOKEN, TWITCH_APP_REDIRECT_URI, TWITCH_SCOPES
 )
 
+from helper.popup import show_popup
+
 class TwitchAuthHandler:
     def __init__(self):
         self.auth_code = None
@@ -44,7 +46,7 @@ class TwitchAuthHandler:
     def start_local_server(self):
         handler_self = self
     
-        # Create new class to allow handle_self reference. Used to store code and signal for complete auth event.
+        # Create new class to allow "handle_self" reference. Used to store code and signal for complete auth event.
         class AuthHandler(http.server.SimpleHTTPRequestHandler):
             def do_GET(handler):
                 parsed_path = urlparse(handler.path)
@@ -93,6 +95,7 @@ class TwitchAuthHandler:
             print("Twitch authentication successful!")
             self.save_tokens()
         else:
+            show_popup("error", "Error exchanging code for token", "While trying to exchange auth code for token an error occoured:\n" + str(token_data))
             print("Error exchanging code for token:", token_data)
             exit(1)
 
@@ -115,6 +118,7 @@ class TwitchAuthHandler:
             print("Token refresh successful!")
             return self.oauth_token
         else:
+            show_popup("error", "Error trying to refresh token", "While trying to to refresh the token an error occoured:\n" + str(token_data))
             print("Failed to refresh token:", token_data)
             exit(1)
 

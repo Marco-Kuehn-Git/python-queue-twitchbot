@@ -3,6 +3,7 @@ from twitchio.ext import commands
 
 from bot.twitch_auth import TwitchAuthHandler
 from bot.config import load_config, TWITCH_CHANNEL
+from helper.popup import show_popup
 
 class TwitchBot(commands.Bot):
     def __init__(self, controller, queue_manager):
@@ -24,6 +25,7 @@ class TwitchBot(commands.Bot):
     async def event_disconnect(self):
         print("Bot disconnected!")
         self.controller.ui.connection_status_changed.emit(False)
+        show_popup("warning", "Bot disconnected!", "The bot got disconnected from Twitch")
 
     async def event_message(self, message):
         if message.echo:
@@ -73,7 +75,7 @@ class TwitchBot(commands.Bot):
         else:
             return 0
 
-    # Override the run method to handle token refresh on 401
+    # Override the run method to handle token refresh on 401 or invalid token
     def run(self):
         try:
             super().run()
@@ -100,5 +102,6 @@ class TwitchBot(commands.Bot):
                 self.should_restart = True
 
             else:
+                show_popup("error", "Failed to refresh tokens!", "Failed to refresh tokens:\n" + str(e))
                 raise e
 

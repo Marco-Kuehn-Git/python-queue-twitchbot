@@ -35,7 +35,6 @@ class UI(QWidget):
         status_layout.addWidget(self.status_icon)
         status_layout.addWidget(self.status_label)
         status_layout.addWidget(self.twitch_auth_button)
-        status_layout.addWidget(self.youtube_auth_button)
 
         # Main Layout
         main_layout = QVBoxLayout()
