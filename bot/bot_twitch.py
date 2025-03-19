@@ -2,7 +2,7 @@ from datetime import datetime
 from twitchio.ext import commands
 
 from bot.twitch_auth import TwitchAuthHandler
-from bot.config import load_config, TWITCH_CHANNEL
+from bot.config import load_config, TWITCH_OAUTH_TOKEN, TWITCH_REFRESH_TOKEN, TWITCH_CHANNEL
 from helper.popup import show_popup
 
 class TwitchBot(commands.Bot):
@@ -82,13 +82,20 @@ class TwitchBot(commands.Bot):
         except Exception as e:
             error_str = str(e).lower()
             token_error = False
+            first_start = False
 
+            if TWITCH_OAUTH_TOKEN == "" and TWITCH_REFRESH_TOKEN == "":
+                first_start = True
+        
             if "401" in error_str or ("invalid" in error_str and "token" in error_str):
                 token_error = True
             elif e.__class__.__name__.lower() == "loginfailure":
                 token_error = True
 
-            if token_error:
+            if token_error and first_start:
+                show_popup("info", "Connect to twitch", "Use the button \"Connect Twitch\" to authorize the bot to send messages.\n"
+                                                        "You can use any Twitch account you want to send the messages.")
+            elif token_error:
                 print("Detected invalid or expired token. Attempting token refresh...")
                 auth_handler = TwitchAuthHandler()
                 auth_handler.refresh_twitch_token()
