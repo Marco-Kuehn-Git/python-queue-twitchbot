@@ -1,4 +1,3 @@
-import os
 import json
 import requests
 import webbrowser
@@ -7,15 +6,14 @@ import socketserver
 import threading
 from urllib.parse import urlparse, parse_qs
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-CONFIG_PATH = os.path.join(BASE_DIR, "..", "config.json")
-
 from bot.config import (
     TWITCH_CLIENT_ID, TWITCH_CLIENT_SECRET, TWITCH_OAUTH_TOKEN,
-    TWITCH_REFRESH_TOKEN, TWITCH_APP_REDIRECT_URI, TWITCH_SCOPES
+    TWITCH_REFRESH_TOKEN, TWITCH_APP_REDIRECT_URI, TWITCH_SCOPES,
+    get_config_path
 )
-
 from helper.popup import show_popup
+
+CONFIG_PATH = get_config_path()
 
 class ThreadingTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     allow_reuse_address = True
