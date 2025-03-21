@@ -17,6 +17,9 @@ from bot.config import (
 
 from helper.popup import show_popup
 
+class ThreadingTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
+    allow_reuse_address = True
+
 class TwitchAuthHandler:
     def __init__(self):
         self.auth_code = None
@@ -45,29 +48,30 @@ class TwitchAuthHandler:
     # Start local server to retrives twitch response
     def start_local_server(self):
         handler_self = self
-    
-        # Create new class to allow "handle_self" reference. Used to store code and signal for complete auth event.
+
         class AuthHandler(http.server.SimpleHTTPRequestHandler):
+            # Disable request logging. Ensures application works as exe file with no console or log file
+            def log_message(self, format, *args):
+                return  
+
             def do_GET(handler):
                 parsed_path = urlparse(handler.path)
                 query_params = parse_qs(parsed_path.query)
                 if "code" in query_params:
                     handler_self.auth_code = query_params["code"][0]
-                    print("Authorization code received!")
                     handler.send_response(200)
                     handler.send_header("Content-type", "text/html")
                     handler.end_headers()
                     handler.wfile.write(b"Authorization successful. You can close this window now.")
+                    handler.wfile.flush()
                     handler_self.auth_event.set()
-                    threading.Thread(target=handler_self.stop_server).start()
                 else:
                     handler.send_response(400)
                     handler.end_headers()
                     handler.wfile.write(b"Authorization failed.")
 
-        self.server = socketserver.TCPServer(("", 8080), AuthHandler)
-        server_thread = threading.Thread(target=self.server.serve_forever)
-        server_thread.daemon = True
+        self.server = ThreadingTCPServer(("127.0.0.1", 8080), AuthHandler)
+        server_thread = threading.Thread(target=self.server.serve_forever, daemon=True)
         server_thread.start()
 
     # Stop local server
