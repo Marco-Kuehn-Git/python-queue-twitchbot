@@ -1,10 +1,25 @@
 import json
+import os
+import sys
+
+def get_config_path():
+    # If running as and exe file
+    if getattr(sys, 'frozen', False):
+        BASE_DIR = os.path.dirname(sys.executable)
+    # If running as script fro debugging    
+    else:
+        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    
+    return os.path.join(BASE_DIR, "config.json")
 
 def load_config():
-    with open("config.json", "r") as f:
+    print("Reading config from: ", CONFIG_PATH)
+    with open(CONFIG_PATH, "r") as f:
         return json.load(f)
-    
+
+CONFIG_PATH = get_config_path()
 CONFIG = load_config()
+print(CONFIG)
 
 TWITCH_OAUTH_TOKEN = CONFIG["twitch_oauth_token"]
 TWITCH_REFRESH_TOKEN = CONFIG["twitch_refresh_token"]
