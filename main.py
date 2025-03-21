@@ -10,14 +10,6 @@ from ui.controller import QueueController
 from bot.bot_twitch import TwitchBot
 from bot.queue_manager import QueueManager
 
-def start_bot(bot):
-    bot.run()
-
-def start_bot_instance(controller, shared_queue_manager):
-    bot = TwitchBot(controller, shared_queue_manager)
-    bot.run()
-    return bot
-
 def start_bot_loop(controller, shared_queue_manager):
     restart_count = 0
     while restart_count < 3:
