@@ -1,5 +1,3 @@
-# bot/queue_manager.py
-
 class QueueManager:
     def __init__(self):
         self.queue = []
@@ -23,10 +21,9 @@ class QueueManager:
 
     # Remove user from selected. (Called when clicking 'x' on UI)
     def remove_user(self, username):
-        for lst in (self.selected):
-            if any(entry[0] == username for entry in lst):
-                lst[:] = [entry for entry in lst if entry[0] != username]
-                return True
+        if any(entry[0] == username for entry in self.selected):
+            self.selected = [entry for entry in self.selected if entry[0] != username]
+            return True
         return False
 
     # Sort the queue (times queued ascending, sub tier descending, join time ascending)
