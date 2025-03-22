@@ -4,13 +4,26 @@ import time
 import asyncio
 from PyQt6.QtWidgets import QApplication
 
-from helper.popup import show_popup
 from ui.ui import UI
 from ui.controller import QueueController
 from bot.bot_twitch import TwitchBot
 from bot.queue_manager import QueueManager
+from bot.config import load_config
+from helper.popup import show_popup
 
 def start_bot_loop(controller, shared_queue_manager):
+
+    # Checking for valid token. Ensures automatic bot start after sucessfull authorization.
+    while True:
+        config = load_config()
+        if config.get("twitch_oauth_token"):
+            print("Valid Twitch token found. Starting bot.")
+            controller.status_message.emit("Twitch authorized. Connecting...")
+            break
+        print("Waiting for valid Twitch token...")
+        controller.status_message.emit("Waiting for Twitch authorization...")
+        time.sleep(3)
+
     restart_count = 0
     while restart_count < 3:
         # Create and set a new event loop for this thread so that TwitchIO can use it.

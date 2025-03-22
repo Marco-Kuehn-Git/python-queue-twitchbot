@@ -17,6 +17,7 @@ class UI(QWidget):
         self.controller.queue_updated.connect(self.refresh_queue)
         self.controller.selected_updated.connect(self.refresh_selected)
         self.controller.connection_status.connect(self.update_status_icon)
+        self.controller.status_message.connect(self.update_status_text)
 
         # Status Indicator
         status_layout = QHBoxLayout()
@@ -161,7 +162,9 @@ class UI(QWidget):
         if self.controller.queue_manager.remove_user(name):
             self.controller.increase_queue_count(name)
             self.controller.update_ui()
-
+    
+    def update_status_text(self, message: str):
+        self.status_label.setText(message)
 
     # Style for the ui
     def get_styles(self):

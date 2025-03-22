@@ -6,6 +6,7 @@ class QueueController(QObject):
     queue_updated = pyqtSignal(list)
     selected_updated = pyqtSignal(list)
     connection_status = pyqtSignal(bool)
+    status_message = pyqtSignal(str)
 
     def __init__(self, queue_manager):
         super().__init__()
