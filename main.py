@@ -8,21 +8,33 @@ from ui.ui import UI
 from ui.controller import QueueController
 from bot.bot_twitch import TwitchBot
 from bot.queue_manager import QueueManager
+from bot.twitch_auth import TwitchAuthHandler
 from bot.config import load_config
 from helper.popup import show_popup
+from helper.tokens import can_connect_with_token
 
 def start_bot_loop(controller, shared_queue_manager):
 
     # Checking for valid token. Ensures automatic bot start after sucessfull authorization.
     while True:
         config = load_config()
-        if config.get("twitch_oauth_token"):
+
+        # If a token is saved
+        if config["twitch_oauth_token"] and can_connect_with_token(config["twitch_oauth_token"]):
             print("Valid Twitch token found. Starting bot.")
             controller.status_message.emit("Twitch authorized. Connecting...")
             break
+        elif not can_connect_with_token(config["twitch_oauth_token"]):
+            print("Non-valid token found. Refreshing tokens...")
+            controller.status_message.emit("Refreshing Twitch token...")
+            auth_handler = TwitchAuthHandler()
+            auth_handler.refresh_twitch_token()
+            time.sleep(2)
+            continue
+
         print("Waiting for valid Twitch token...")
         controller.status_message.emit("Waiting for Twitch authorization...")
-        time.sleep(3)
+        time.sleep(2)
 
     restart_count = 0
     while restart_count < 3:
@@ -47,7 +59,7 @@ def start_bot_loop(controller, shared_queue_manager):
             print("Bot terminated normally. Exiting restart loop.")
             break
     else:
-        # If we reached 5 restarts, warn the user.
+        # If reached maximum restarts, warn the user.
         print("Maximum bot restarts reached. Please restart the application manually.")
         show_popup("warning", "Restart needed", "Tokens have been refreshed but the bot failed to restart.\nPlease restart the application.\n\n"
                                                 "If this error continues to show, check your config.json file for any wrong values.")

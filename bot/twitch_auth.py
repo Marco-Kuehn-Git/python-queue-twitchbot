@@ -93,7 +93,7 @@ class TwitchAuthHandler:
         
         if "access_token" in token_data:
             self.oauth_token = token_data["access_token"]
-            self.refresh_token = token_data.get("refresh_token")
+            self.refresh_token = token_data["refresh_token"]
             print("Twitch authentication successful!")
             self.save_tokens()
         else:

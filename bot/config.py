@@ -19,7 +19,6 @@ def load_config():
 
 CONFIG_PATH = get_config_path()
 CONFIG = load_config()
-print(CONFIG)
 
 TWITCH_OAUTH_TOKEN = CONFIG["twitch_oauth_token"]
 TWITCH_REFRESH_TOKEN = CONFIG["twitch_refresh_token"]
