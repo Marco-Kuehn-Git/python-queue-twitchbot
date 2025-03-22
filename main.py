@@ -20,17 +20,20 @@ def start_bot_loop(controller, shared_queue_manager):
         config = load_config()
 
         # If a token is saved
-        if config["twitch_oauth_token"] and can_connect_with_token(config["twitch_oauth_token"]):
-            print("Valid Twitch token found. Starting bot.")
-            controller.status_message.emit("Twitch authorized. Connecting...")
-            break
-        elif not can_connect_with_token(config["twitch_oauth_token"]):
-            print("Non-valid token found. Refreshing tokens...")
-            controller.status_message.emit("Refreshing Twitch token...")
-            auth_handler = TwitchAuthHandler()
-            auth_handler.refresh_twitch_token()
-            time.sleep(2)
-            continue
+        if config["twitch_oauth_token"]:
+            #If saved token is valid
+            if can_connect_with_token(config["twitch_oauth_token"]):
+                print("Valid Twitch token found. Starting bot.")
+                controller.status_message.emit("Twitch authorized. Connecting...")
+                break
+            else:
+                print("Non-valid token found. Refreshing tokens...")
+                controller.status_message.emit("Refreshing Twitch token...")
+                auth_handler = TwitchAuthHandler()
+                auth_handler.refresh_twitch_token()
+                time.sleep(2)
+                continue
+        
 
         print("Waiting for valid Twitch token...")
         controller.status_message.emit("Waiting for Twitch authorization...")
