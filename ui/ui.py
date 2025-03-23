@@ -82,26 +82,34 @@ class UI(QWidget):
         name_label = QLabel(name)
         name_label.setObjectName("nameLabel")
         name_label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        item_layout.addWidget(name_label)
 
-        details_label = QLabel(f"Tier {tier} | Queued: {games}")
-        details_label.setObjectName("detailsLabel")
+        if list_widget == self.queue_list:
+            details_label = QLabel(f"Tier {tier} | Queued: {games}")
+            details_label.setObjectName("detailsLabel")
+            item_layout.addWidget(details_label)
 
         move_button = QPushButton("⮞" if list_widget == self.queue_list else "⮜")
         move_button.setObjectName("moveButton")
         move_button.setToolTip("Move to selected" if list_widget == self.queue_list else "Move back to queue")
         move_button.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Fixed)
-        move_button.clicked.connect(lambda: move_callback(name))
-
-        remove_button = QPushButton("X")
-        remove_button.setToolTip("Remove from list")
-        remove_button.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Fixed)
-        remove_button.clicked.connect(lambda: self.remove_from_selected(name))
-
-        item_layout.addWidget(name_label)
-        item_layout.addWidget(details_label)
+        move_button.clicked.connect(lambda: move_callback(name)) 
         item_layout.addWidget(move_button)
 
+        # For selected list items, add two remove buttons:
         if list_widget == self.selected_list:
+            # New remove button that doesn't increase the count
+            remove_no_count_button = QPushButton("X")  # You can change the label/icon as needed
+            remove_no_count_button.setToolTip("Remove from list without increasing queued counter")
+            remove_no_count_button.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Fixed)
+            remove_no_count_button.clicked.connect(lambda: self.remove_from_selected_without_count(name))
+            item_layout.addWidget(remove_no_count_button)
+
+            # Existing remove button (which increases times queued)
+            remove_button = QPushButton("✓")
+            remove_button.setToolTip("Remove from list (increases queued count)")
+            remove_button.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Fixed)
+            remove_button.clicked.connect(lambda: self.remove_from_selected(name))
             item_layout.addWidget(remove_button)
 
         list_item = QListWidgetItem()
@@ -161,6 +169,11 @@ class UI(QWidget):
     def remove_from_selected(self, name):
         if self.controller.queue_manager.remove_user(name):
             self.controller.increase_queue_count(name)
+            self.controller.update_ui()
+    
+    # Removes the user from the selected list without increasing their queued counter.
+    def remove_from_selected_without_count(self, name):
+        if self.controller.queue_manager.remove_user(name):
             self.controller.update_ui()
     
     def update_status_text(self, message: str):
