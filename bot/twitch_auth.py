@@ -6,12 +6,12 @@ import socketserver
 import threading
 from urllib.parse import urlparse, parse_qs
 
+from helper.helper import show_popup
 from bot.config import (
     TWITCH_CLIENT_ID, TWITCH_CLIENT_SECRET, TWITCH_OAUTH_TOKEN,
     TWITCH_REFRESH_TOKEN, TWITCH_APP_REDIRECT_URI, TWITCH_SCOPES,
     get_config_path
 )
-from helper.popup import show_popup
 
 CONFIG_PATH = get_config_path()
 

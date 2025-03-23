@@ -10,8 +10,7 @@ from bot.bot_twitch import TwitchBot
 from bot.queue_manager import QueueManager
 from bot.twitch_auth import TwitchAuthHandler
 from bot.config import load_config
-from helper.popup import show_popup
-from helper.tokens import can_connect_with_token
+from helper.helper import show_popup, can_connect_with_token
 
 def start_bot_loop(controller, shared_queue_manager):
 

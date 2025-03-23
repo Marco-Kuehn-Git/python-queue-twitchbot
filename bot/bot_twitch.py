@@ -3,7 +3,7 @@ from twitchio.ext import commands
 
 from bot.twitch_auth import TwitchAuthHandler
 from bot.config import load_config, TWITCH_CHANNEL
-from helper.popup import show_popup
+from helper.helper import show_popup
 
 class TwitchBot(commands.Bot):
     def __init__(self, controller, queue_manager):
