@@ -5,7 +5,10 @@ The viewers are sorted based on times queued, sub tier and time joined.
 
 <br />
 
-Create a config.json file at the same level as main.py
+If wanting to run this as a script:
+
+Create a config.json file inside the bot folder.
+The content should look like this:
 <br />
    ```sh
    {
@@ -17,5 +20,6 @@ Create a config.json file at the same level as main.py
     "twitch_scopes": [
         "chat:read",
         "chat:edit"
-    ]
+    ],
+    "twitch_channel": "your_twitch_channel"
 ```
