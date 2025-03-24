@@ -85,7 +85,7 @@ Viewers are sorted based on the number of times queued, subscription tier, and t
    }
    ```
 
-4. **Follow Steps 2 and 3 from the User Installation**
+4. **Follow Steps 2-4 from the User Installation**
 
 5. **Run the Bot**
    ```sh
