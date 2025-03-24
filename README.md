@@ -60,8 +60,8 @@ Viewers are sorted based on the number of times queued, subscription tier, and t
 
 1. **Clone the Repository**
    ```sh
-   git clone https://github.com/your-repo/twitch-queue-bot.git
-   cd twitch-queue-bot
+   git clone https://github.com/Marco-Kuehn-Git/python-queue-twitchbot.git
+   cd python-queue-twitchbot
    ```
 
 2. **Install Dependencies**
