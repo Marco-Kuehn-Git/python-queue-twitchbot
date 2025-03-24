@@ -3,17 +3,23 @@ import os
 import sys
 
 def get_config_path():
-    # If running as and exe file
+    """
+    Returns the absolute path to the config.json file.
+    """
     if getattr(sys, 'frozen', False):
+        # Running as executable
         BASE_DIR = os.path.dirname(sys.executable)
-    # If running as script fro debugging    
     else:
+        # Running as python script
         BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     
     return os.path.join(BASE_DIR, "config.json")
 
 def load_config():
-    print("Reading config from: ", CONFIG_PATH)
+    """
+    Load and return the configuration from config.json.
+    """
+    print("Reading config from:", CONFIG_PATH)
     with open(CONFIG_PATH, "r") as f:
         return json.load(f)
 

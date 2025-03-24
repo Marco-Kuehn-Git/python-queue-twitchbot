@@ -5,8 +5,12 @@ import sys
 
 from bot.config import TWITCH_CLIENT_ID
 
-# A simple check to see if token is valid or not
 def can_connect_with_token(token):
+    """
+    Checks if a connection to Twitch can be established using the provided token.
+
+    Returns True if the token is valid (HTTP status 200), otherwise False.
+    """
     headers = {
         "Authorization": f"Bearer {token}",
         "Client-Id": TWITCH_CLIENT_ID,
@@ -18,19 +22,28 @@ def can_connect_with_token(token):
         print("Error testing token connectivity:", e)
         return False
 
-# A function to create popups
 def show_popup(type, title, message):
+    """
+    Creates a popup message window using tkinter.
+    
+    Args
+    - type (str): Type of popup ('info', 'warning', or 'error').
+    - title (str): Title of the popup window.
+    - message (str): Message content to display.
+    
+    Raises ValueError If an invalid popup type is provided.
+    """
     root = tk.Tk()
     root.withdraw()
-    
-    types = {
+
+    popup_types = {
         "info": messagebox.showinfo,
         "warning": messagebox.showwarning,
         "error": messagebox.showerror
     }
     
-    if type in types:
-        types[type](title, message)
+    if type in popup_types:
+        popup_types[type](title, message)
     else:
         raise ValueError("Invalid popup type. Use 'info', 'warning', or 'error'.")
     

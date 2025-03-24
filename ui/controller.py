@@ -1,7 +1,6 @@
 from PyQt6.QtCore import QObject, pyqtSignal
 
 class QueueController(QObject):
-
     # Signals for UI updates
     queue_updated = pyqtSignal(list)
     selected_updated = pyqtSignal(list)
@@ -9,24 +8,34 @@ class QueueController(QObject):
     status_message = pyqtSignal(str)
 
     def __init__(self, queue_manager):
+        """
+        Initialize the controller with a shared queue manager.
+        """
         super().__init__()
         self.queue_manager = queue_manager
         self.queue_count = {}
 
-    # Update queue list in the ui
     def update_ui(self):
+        """
+        Emit signals to update both the queue and the selected lists in the UI.
+        """
         self.queue_updated.emit(self.queue_manager.get_queue())
         self.selected_updated.emit(self.queue_manager.get_selected())
 
-    # Update selected list
     def update_selected(self, selected):
-        self.selected = selected
+        """
+        Emit the new selected list.
+        """
         self.selected_updated.emit(selected)
 
-    # Increase number of times user has queued
     def increase_queue_count(self, name):
+        """
+        Increase the count of how many times a user has joined the queue.
+        """
         self.queue_count[name] = self.queue_count.get(name, 0) + 1
 
-    # Get the nuber of times user has queued (default 0)
     def get_queue_count(self, name):
+        """
+        Return the number of times a user has joined the queue (default is 0).
+        """
         return self.queue_count.get(name, 0)

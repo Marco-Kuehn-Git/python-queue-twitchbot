@@ -19,15 +19,22 @@ class ThreadingTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     allow_reuse_address = True
 
 class TwitchAuthHandler:
+    """
+    Handles Twitch authentication by starting a local server to capture the auth code,
+    exchanging it for tokens, and refreshing tokens when necessary.
+    """
     def __init__(self):
         self.auth_code = None
-        self.oauth_token = None if not TWITCH_OAUTH_TOKEN else TWITCH_OAUTH_TOKEN
-        self.refresh_token = None if not TWITCH_REFRESH_TOKEN else TWITCH_REFRESH_TOKEN
+        self.oauth_token = TWITCH_OAUTH_TOKEN if TWITCH_OAUTH_TOKEN else None
+        self.refresh_token = TWITCH_REFRESH_TOKEN if TWITCH_REFRESH_TOKEN else None
         self.server = None
         self.auth_event = threading.Event()
 
-    # Start the authorization process
     def start_auth(self):
+        """
+        Starts the Twitch authorization process by opening the auth URL,
+        starting a local server to capture the response, and exchanging the auth code for tokens.
+        """
         print("Starting Twitch authorization...")
         auth_url = (
             f"https://id.twitch.tv/oauth2/authorize?"
@@ -42,15 +49,18 @@ class TwitchAuthHandler:
         print("Waiting for Twitch authorization...")
         self.auth_event.wait()
         self.exchange_code_for_token()
+        self.stop_server()
 
-    # Start local server to retrives twitch response
     def start_local_server(self):
+        """
+        Starts a local TCP server to listen for Twitch's authorization redirect.
+        """
         handler_self = self
 
         class AuthHandler(http.server.SimpleHTTPRequestHandler):
-            # Disable request logging. Ensures application works as exe file with no console or log file
+            # Disable logging for cleaner output and possibillity to run executable wihtout console
             def log_message(self, format, *args):
-                return  
+                return
 
             def do_GET(handler):
                 parsed_path = urlparse(handler.path)
@@ -72,14 +82,10 @@ class TwitchAuthHandler:
         server_thread = threading.Thread(target=self.server.serve_forever, daemon=True)
         server_thread.start()
 
-    # Stop local server
-    def stop_server(self):
-        if self.server:
-            self.server.shutdown()
-            self.server.server_close()
-
-    # Exchange access code for tokens
     def exchange_code_for_token(self):
+        """
+        Exchanges the captured authorization code for an access token and refresh token.
+        """
         url = "https://id.twitch.tv/oauth2/token"
         data = {
             "client_id": TWITCH_CLIENT_ID,
@@ -97,12 +103,15 @@ class TwitchAuthHandler:
             print("Twitch authentication successful!")
             self.save_tokens()
         else:
-            show_popup("error", "Error exchanging code for token", "While trying to exchange auth code for token an error occoured:\n" + str(token_data))
+            show_popup("error", "Error exchanging code for token",
+                       "Error during token exchange:\n" + str(token_data))
             print("Error exchanging code for token:", token_data)
             exit(1)
 
-    # Refresh expired or wrong token
     def refresh_twitch_token(self):
+        """
+        Refreshes the access token using the current refresh token.
+        """
         url = "https://id.twitch.tv/oauth2/token"
         data = {
             "grant_type": "refresh_token",
@@ -120,12 +129,15 @@ class TwitchAuthHandler:
             print("Token refresh successful!")
             return self.oauth_token
         else:
-            show_popup("error", "Error trying to refresh token", "While trying to to refresh the token an error occoured:\n" + str(token_data))
+            show_popup("error", "Error refreshing token",
+                       "Error during token refresh:\n" + str(token_data))
             print("Failed to refresh token:", token_data)
             exit(1)
 
-    # Saves token to config.json
     def save_tokens(self):
+        """
+        Saves the current access and refresh tokens to the configuration file.
+        """
         with open(CONFIG_PATH, "r") as file:
             config = json.load(file)
         config["twitch_oauth_token"] = self.oauth_token
@@ -133,3 +145,11 @@ class TwitchAuthHandler:
         with open(CONFIG_PATH, "w") as file:
             json.dump(config, file, indent=4)
         print("Tokens saved successfully!")
+
+    def stop_server(self):
+        """
+        Stops the local server used for authentication.
+        """
+        if self.server:
+            self.server.shutdown()
+            self.server.server_close()

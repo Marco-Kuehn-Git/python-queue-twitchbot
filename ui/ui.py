@@ -8,6 +8,10 @@ from .controller import QueueController
 
 class UI(QWidget):
     def __init__(self, controller: QueueController):
+        """
+        Initialize the UI with a reference to the QueueController.
+        Sets up the main window, status indicators, and list widgets.
+        """
         super().__init__()
         self.setWindowTitle("Queue Manager")
         self.setGeometry(100, 60, 1100, 700)
@@ -19,7 +23,7 @@ class UI(QWidget):
         self.controller.connection_status.connect(self.update_status_icon)
         self.controller.status_message.connect(self.update_status_text)
 
-        # Status Indicator
+        # Set up status area and twitch authorization button
         status_layout = QHBoxLayout()
         self.status_label = QLabel("Disconnected")
         self.status_label.setObjectName("statusLabel")
@@ -28,23 +32,23 @@ class UI(QWidget):
         self.status_icon.setFixedSize(20, 20)
         self.update_status_icon(False)
 
-        # Twitch auth button
+        # Set up the button to connect twitch
         self.twitch_auth_button = QPushButton("Connect Twitch")
         self.twitch_auth_button.setToolTip("Click to authorize Twitch")
         self.twitch_auth_button.clicked.connect(self.authorize_twitch)
 
+        # Set up the ui above the lists
         status_layout.addWidget(self.status_icon)
         status_layout.addWidget(self.status_label)
         status_layout.addWidget(self.twitch_auth_button)
 
-        # Main Layout
+        # Main layout including status and the two lists (queue and selected)
         main_layout = QVBoxLayout()
         main_layout.addLayout(status_layout)
 
-        # Queue & Selected Players Layout
         queue_selected_layout = QHBoxLayout()
-        
-        # Queue Box
+
+        # Queue group box
         self.queue_box = QGroupBox("Queue")
         self.queue_box.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.queue_box.setObjectName("queueBox")
@@ -55,7 +59,7 @@ class UI(QWidget):
         queue_layout.addWidget(self.queue_list)
         self.queue_box.setLayout(queue_layout)
 
-        # Selected Players Box
+        # Selected group box
         self.selected_box = QGroupBox("Up Next")
         self.selected_box.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.selected_box.setObjectName("selectedBox")
@@ -72,9 +76,11 @@ class UI(QWidget):
         main_layout.addLayout(queue_selected_layout)
         self.setLayout(main_layout)
 
-
-    # Add a user to one of the lists (queue or selected)
     def add_to_list(self, list_widget, name, tier, games, move_callback):
+        """
+        Add a user item to the provided list widget with a move button.
+        For the selected list, also add two remove buttons.
+        """
         item_frame = QFrame()
         item_layout = QHBoxLayout()
         item_frame.setLayout(item_layout)
@@ -93,19 +99,19 @@ class UI(QWidget):
         move_button.setObjectName("moveButton")
         move_button.setToolTip("Move to selected" if list_widget == self.queue_list else "Move back to queue")
         move_button.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Fixed)
-        move_button.clicked.connect(lambda: move_callback(name)) 
+        move_button.clicked.connect(lambda: move_callback(name))
         item_layout.addWidget(move_button)
 
-        # For selected list items, add two remove buttons:
+        # For selected list items, add two remove buttons.
         if list_widget == self.selected_list:
-            # New remove button that doesn't increase the count
-            remove_no_count_button = QPushButton("X")  # You can change the label/icon as needed
+            # Remove without incrementing count
+            remove_no_count_button = QPushButton("X")
             remove_no_count_button.setToolTip("Remove from list without increasing queued counter")
             remove_no_count_button.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Fixed)
             remove_no_count_button.clicked.connect(lambda: self.remove_from_selected_without_count(name))
             item_layout.addWidget(remove_no_count_button)
 
-            # Existing remove button (which increases times queued)
+            # Remove and increase queued counter
             remove_button = QPushButton("✓")
             remove_button.setToolTip("Remove from list (increases queued count)")
             remove_button.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Fixed)
@@ -117,8 +123,10 @@ class UI(QWidget):
         list_widget.addItem(list_item)
         list_widget.setItemWidget(list_item, item_frame)
 
-    # Updates the status to show if connected or disconnected
     def update_status_icon(self, connected: bool):
+        """
+        Update the connection status icon and text based on the connection state.
+        """
         color = QColor("#28a745") if connected else QColor("#dc3545")
         text = "Connected" if connected else "Disconnected"
 
@@ -134,6 +142,9 @@ class UI(QWidget):
         self.status_label.setText(text)
 
     def authorize_twitch(self):
+        """
+        Initiate Twitch authorization in a separate thread.
+        """
         import threading
         from bot.twitch_auth import TwitchAuthHandler
 
@@ -144,43 +155,61 @@ class UI(QWidget):
 
         threading.Thread(target=auth_thread, daemon=True).start()
 
-    # Refresh queue list in ui
     def refresh_queue(self):
+        """
+        Clear and repopulate the queue list widget.
+        """
         self.queue_list.clear()
         for name, tier, games, _ in self.controller.queue_manager.get_queue():
             self.add_to_list(self.queue_list, name, tier, games, self.move_to_selected)
 
-    # Refresh selected list in ui
     def refresh_selected(self):
+        """
+        Clear and repopulate the selected list widget.
+        """
         self.selected_list.clear()
         for name, tier, games, _ in self.controller.queue_manager.get_selected():
             self.add_to_list(self.selected_list, name, tier, games, self.move_back_to_queue)
-    # Move user from queue to 'next up'
+
     def move_to_selected(self, name):
+        """
+        Move a user from the queue to the selected list.
+        """
         if self.controller.queue_manager.move_to_selected(name):
             self.controller.update_ui()
 
-    # Move user back to queue inserting them into the correct position
     def move_back_to_queue(self, name):
+        """
+        Move a user from the selected list back to the queue.
+        """
         if self.controller.queue_manager.move_back_to_queue(name):
             self.controller.update_ui()
 
-    # Remove user from selected and increase their queue count
     def remove_from_selected(self, name):
+        """
+        Remove a user from the selected list and increment their queued count.
+        """
         if self.controller.queue_manager.remove_user(name):
             self.controller.increase_queue_count(name)
             self.controller.update_ui()
     
-    # Removes the user from the selected list without increasing their queued counter.
     def remove_from_selected_without_count(self, name):
+        """
+        Remove a user from the selected list without modifying the queued count.
+        """
         if self.controller.queue_manager.remove_user(name):
             self.controller.update_ui()
     
     def update_status_text(self, message: str):
+        """
+        Update the status label text.
+        """
         self.status_label.setText(message)
 
-    # Style for the ui
     def get_styles(self):
+        """
+        Return the UI stylesheet.
+        """
         return """
             QWidget {
                 background-color: #18181b; 
@@ -188,7 +217,6 @@ class UI(QWidget):
                 font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
                 font-size: 14px;
             }
-
             QGroupBox {
                 background: #292b2f; 
                 border-radius: 8px;
@@ -199,13 +227,11 @@ class UI(QWidget):
                 text-align: center;
                 border: 2px solid #3a3a3c; 
             }
-
             QLabel {
                 font-size: 16px;
                 font-weight: bold;
                 color: #E9E9E9; 
             }
-
             QListWidget {
                 background: #40444b; 
                 border-radius: 6px;
@@ -214,23 +240,19 @@ class UI(QWidget):
                 color: #E9E9E9; 
                 border: none;
             }
-
             QFrame#queueItem, QFrame#selectedItem {
                 border-radius: 6px;
                 border: 1px solid #3a3a3c; 
             }
-
             QLabel#nameLabel {
                 font-weight: bold;
                 color: #FFFFFF; 
             }
-
             QLabel#detailsLabel {
                 color: #939393;
                 font-size: 14px;
                 text-align: right;
             }
-
             QPushButton {
                 background: #5865f2;
                 color: #E9E9E9; 
@@ -239,19 +261,15 @@ class UI(QWidget):
                 border-radius: 4px;
                 font-size: 16px;
             }
-
             QPushButton#mooveButton{
                 margin-left: 15px;
             }
-
             QPushButton:hover {
                 background: #4752c4;
             }
-
             QPushButton:pressed {
                 background: #3b43a1; 
             }
-
             QPushButton:focus {
                 outline: none;
                 border: 2px solid #5865f2;
