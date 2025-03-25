@@ -10,7 +10,7 @@ Viewers are sorted based on the number of times queued, subscription tier, and t
 ## Installation (User)
 
 1. **Download and Extract**
-   - Download and extract the latest `.zip` file from the [Releases](#) section.
+   - Download and extract the latest `.zip` file from the [Releases](https://github.com/Marco-Kuehn-Git/python-queue-twitchbot/releases) section.
 
 2. **Create a Twitch Application**
    - Visit the [Twitch Developer Console](https://dev.twitch.tv/console)
