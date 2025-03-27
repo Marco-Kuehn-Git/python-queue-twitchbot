@@ -14,7 +14,7 @@ Features listed are in no particular order:
 - **UI-Based Configuration** – Enable users to modify `config.json` settings through a graphical interface.  
 - **Advanced Queue Sorting** – Provide different queue sorting options. Changable in the settings.
 - **Queue Toggle** – Add a switch to open or close the queue easily.  
-- **Persistant Queue Data** - Save current queue in case the application crashes. Option in load previous queue when starting application.
+- **Persistant Queue Data** - Save current queue in case the application crashes. Option to load previous queue when starting the application.
 - **YouTube Live Chat Integration** – Add support for YouTube Live Chat, allowing users to choose Twitch, YouTube, or both. 
 - **Support for Additional OS** - Make the application available on Linux and macOS.
 
