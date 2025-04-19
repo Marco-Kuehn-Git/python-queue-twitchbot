@@ -14,6 +14,7 @@ class QueueController(QObject):
         super().__init__()
         self.queue_manager = queue_manager
         self.queue_count = {}
+        self.queue_closed = False
 
     def update_ui(self):
         """
@@ -39,3 +40,7 @@ class QueueController(QObject):
         Return the number of times a user has joined the queue (default is 0).
         """
         return self.queue_count.get(name, 0)
+    
+    def set_queue_closed(self, closed: bool):
+        """Called by the UI toggle to open/close the queue."""
+        self.queue_closed = closed

@@ -50,6 +50,11 @@ class TwitchBot(commands.Bot):
         Command to add a user to the queue.
         """
         username = ctx.author.name
+
+        if self.controller.queue_closed:
+            await ctx.send(f"@{username}, the queue is currently closed. You can’t join right now.")
+            return
+
         sub_tier = self.get_sub_tier(ctx.author)
         times_queued = self.controller.get_queue_count(username)
         join_time = datetime.now().timestamp()

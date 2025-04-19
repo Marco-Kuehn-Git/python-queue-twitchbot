@@ -6,6 +6,8 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QPixmap, QColor, QPainter
 from .controller import QueueController
 
+from ui.toggleButton import ToggleSwitch
+
 class UI(QWidget):
     def __init__(self, controller: QueueController):
         """
@@ -42,9 +44,28 @@ class UI(QWidget):
         status_layout.addWidget(self.status_label)
         status_layout.addWidget(self.twitch_auth_button)
 
+        # Toggle layout for closing the queue
+        toggle_layout = QHBoxLayout()
+        toggle_label = QLabel("Close queue: ")
+        toggle_label.setObjectName("toggleLabel")
+        toggle_label.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+
+        # Create the toggle switch for closing the queue
+        queue_toggle_button = ToggleSwitch()
+        queue_toggle_button.toggled.connect(self.controller.set_queue_closed)
+        queue_toggle_button.setFixedSize(
+            queue_toggle_button.sizeHint().width() * 2,
+            queue_toggle_button.sizeHint().height()
+        )
+
+        toggle_layout.addWidget(toggle_label)
+        toggle_layout.addWidget(queue_toggle_button)
+        toggle_layout.addStretch()
+
         # Main layout including status and the two lists (queue and selected)
         main_layout = QVBoxLayout()
         main_layout.addLayout(status_layout)
+        main_layout.addLayout(toggle_layout)
 
         queue_selected_layout = QHBoxLayout()
 
