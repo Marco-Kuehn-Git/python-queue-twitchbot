@@ -2,20 +2,19 @@ from datetime import datetime
 from twitchio.ext import commands
 
 from bot.twitch_auth import TwitchAuthHandler
-from bot.config import load_config, TWITCH_CHANNEL
 from helper.helper import show_popup
 
 class TwitchBot(commands.Bot):
     """
     Twitch chat bot for managing the viewer queue.
     """
-    def __init__(self, controller, queue_manager):
-        config = load_config()
-        token_from_config = config["twitch_oauth_token"]
+    def __init__(self, controller, queue_manager, config):
+        self.config = config
+        token_from_config = config.twitch_oauth_token
         super().__init__(
             token=token_from_config,
             prefix="!",
-            initial_channels=[TWITCH_CHANNEL]
+            initial_channels=[config.twitch_channel]
         )
         self.controller = controller
         self.queue_manager = queue_manager

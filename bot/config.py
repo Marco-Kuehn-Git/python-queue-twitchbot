@@ -2,6 +2,42 @@ import json
 import os
 import sys
 
+class Config():
+    def __init__(self):
+        config = self.load_config()
+        self.twitch_oauth_token = config["twitch_oauth_token"]
+        self.twitch_refresh_token = config["twitch_refresh_token"]
+        self.twitch_client_id = config["twitch_client_id"]
+        self.twitch_client_secret = config["twitch_client_secret"]
+        self.twitch_app_redirect_uri = config["twitch_app_redirect_uri"]
+        self.twitch_scopes = config["twitch_scopes"]
+        self.twitch_channel = config["twitch_channel"]
+
+    def load_config(self):
+        """
+        Loads the data from the config.json
+        """
+        print("Reading config from:", get_config_path())
+        with open(get_config_path(), "r") as f:
+            return json.load(f)
+
+    def save_config(self):
+        """
+        Saves the current config object as a json file.
+        """
+        config_data = {
+            "twitch_oauth_token": self.twitch_oauth_token,
+            "twitch_refresh_token": self.twitch_refresh_token,
+            "twitch_client_id": self.twitch_client_id,
+            "twitch_client_secret": self.twitch_client_secret,
+            "twitch_app_redirect_uri": self.twitch_app_redirect_uri,
+            "twitch_scopes": self.twitch_scopes,
+            "twitch_channel": self.twitch_channel
+        }
+
+        with open(get_config_path(), "w") as f:
+            json.dump(config_data, f, indent=4)
+
 def get_config_path():
     """
     Returns the absolute path to the config.json file.
@@ -14,22 +50,3 @@ def get_config_path():
         BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     
     return os.path.join(BASE_DIR, "config.json")
-
-def load_config():
-    """
-    Load and return the configuration from config.json.
-    """
-    print("Reading config from:", CONFIG_PATH)
-    with open(CONFIG_PATH, "r") as f:
-        return json.load(f)
-
-CONFIG_PATH = get_config_path()
-CONFIG = load_config()
-
-TWITCH_OAUTH_TOKEN = CONFIG["twitch_oauth_token"]
-TWITCH_REFRESH_TOKEN = CONFIG["twitch_refresh_token"]
-TWITCH_CLIENT_ID = CONFIG["twitch_client_id"]
-TWITCH_CLIENT_SECRET = CONFIG["twitch_client_secret"]
-TWITCH_APP_REDIRECT_URI = CONFIG["twitch_app_redirect_uri"]
-TWITCH_SCOPES = CONFIG["twitch_scopes"]
-TWITCH_CHANNEL = CONFIG["twitch_channel"]

@@ -9,22 +9,24 @@ from .controller import QueueController
 from ui.toggleButton import ToggleSwitch
 
 class UI(QWidget):
-    def __init__(self, controller: QueueController):
-        """
-        Initialize the UI with a reference to the QueueController.
-        Sets up the main window, status indicators, and list widgets.
-        """
+    def __init__(self, controller: QueueController, config):
         super().__init__()
-        self.setWindowTitle("Queue Manager")
-        self.setGeometry(100, 60, 1100, 700)
-        self.setStyleSheet(self.get_styles())
-
+        self.config = config
         self.controller = controller
         self.controller.queue_updated.connect(self.refresh_queue)
         self.controller.selected_updated.connect(self.refresh_selected)
         self.controller.connection_status.connect(self.update_status_icon)
         self.controller.status_message.connect(self.update_status_text)
 
+        self.setWindowTitle("Queue Manager")
+        self.setGeometry(100, 60, 1100, 700)
+        self._setup_ui()
+        self.setStyleSheet(self.get_styles())
+
+    def _setup_ui(self):
+        """
+        Initialize the UI
+        """
         # Set up status area and twitch authorization button
         status_layout = QHBoxLayout()
         self.status_label = QLabel("Disconnected")
@@ -57,7 +59,6 @@ class UI(QWidget):
             queue_toggle_button.sizeHint().width() * 2,
             queue_toggle_button.sizeHint().height()
         )
-
         toggle_layout.addWidget(toggle_label)
         toggle_layout.addWidget(queue_toggle_button)
         toggle_layout.addStretch()
@@ -171,7 +172,7 @@ class UI(QWidget):
 
         def auth_thread():
             print("Starting Twitch authorization via UI button...")
-            auth_handler = TwitchAuthHandler()
+            auth_handler = TwitchAuthHandler(self.config)
             auth_handler.start_auth() 
 
         threading.Thread(target=auth_thread, daemon=True).start()

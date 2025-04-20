@@ -3,9 +3,8 @@ import tkinter as tk
 from tkinter import messagebox
 import sys
 
-from bot.config import TWITCH_CLIENT_ID
 
-def can_connect_with_token(token):
+def can_connect_with_token(token, config):
     """
     Checks if a connection to Twitch can be established using the provided token.
 
@@ -13,7 +12,7 @@ def can_connect_with_token(token):
     """
     headers = {
         "Authorization": f"Bearer {token}",
-        "Client-Id": TWITCH_CLIENT_ID,
+        "Client-Id": config.twitch_client_id,
     }
     try:
         response = requests.get("https://api.twitch.tv/helix/users", headers=headers, timeout=5)

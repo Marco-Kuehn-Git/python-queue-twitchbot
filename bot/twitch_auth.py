@@ -7,13 +7,6 @@ import threading
 from urllib.parse import urlparse, parse_qs
 
 from helper.helper import show_popup
-from bot.config import (
-    TWITCH_CLIENT_ID, TWITCH_CLIENT_SECRET, TWITCH_OAUTH_TOKEN,
-    TWITCH_REFRESH_TOKEN, TWITCH_APP_REDIRECT_URI, TWITCH_SCOPES,
-    get_config_path
-)
-
-CONFIG_PATH = get_config_path()
 
 class ThreadingTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     allow_reuse_address = True
@@ -23,10 +16,11 @@ class TwitchAuthHandler:
     Handles Twitch authentication by starting a local server to capture the auth code,
     exchanging it for tokens, and refreshing tokens when necessary.
     """
-    def __init__(self):
+    def __init__(self, config):
+        self.config = config
+        self.oauth_token = self.config.twitch_oauth_token if self.config.twitch_oauth_token else None
+        self.refresh_token = self.config.twitch_refresh_token if self.config.twitch_refresh_token else None
         self.auth_code = None
-        self.oauth_token = TWITCH_OAUTH_TOKEN if TWITCH_OAUTH_TOKEN else None
-        self.refresh_token = TWITCH_REFRESH_TOKEN if TWITCH_REFRESH_TOKEN else None
         self.server = None
         self.auth_event = threading.Event()
 
@@ -38,10 +32,10 @@ class TwitchAuthHandler:
         print("Starting Twitch authorization...")
         auth_url = (
             f"https://id.twitch.tv/oauth2/authorize?"
-            f"client_id={TWITCH_CLIENT_ID}&"
+            f"client_id={self.config.twitch_client_id}&"
             f"response_type=code&"
-            f"redirect_uri={TWITCH_APP_REDIRECT_URI}&"
-            f"scope={' '.join(TWITCH_SCOPES)}"
+            f"redirect_uri={self.config.twitch_app_redirect_uri}&"
+            f"scope={' '.join(self.config.twitch_scopes)}"
         )
         webbrowser.open(auth_url)
         self.start_local_server()
@@ -88,11 +82,11 @@ class TwitchAuthHandler:
         """
         url = "https://id.twitch.tv/oauth2/token"
         data = {
-            "client_id": TWITCH_CLIENT_ID,
-            "client_secret": TWITCH_CLIENT_SECRET,
+            "client_id": self.config.twitch_client_id,
+            "client_secret": self.config.twitch_client_secret,
             "code": self.auth_code,
             "grant_type": "authorization_code",
-            "redirect_uri": TWITCH_APP_REDIRECT_URI
+            "redirect_uri": self.config.twitch_app_redirect_uri
         }
         response = requests.post(url, data=data)
         token_data = response.json()
@@ -116,8 +110,8 @@ class TwitchAuthHandler:
         data = {
             "grant_type": "refresh_token",
             "refresh_token": self.refresh_token,
-            "client_id": TWITCH_CLIENT_ID,
-            "client_secret": TWITCH_CLIENT_SECRET
+            "client_id": self.config.twitch_client_id,
+            "client_secret": self.config.twitch_client_secret
         }
         response = requests.post(url, data=data)
         token_data = response.json()
@@ -138,13 +132,9 @@ class TwitchAuthHandler:
         """
         Saves the current access and refresh tokens to the configuration file.
         """
-        with open(CONFIG_PATH, "r") as file:
-            config = json.load(file)
-        config["twitch_oauth_token"] = self.oauth_token
-        config["twitch_refresh_token"] = self.refresh_token
-        with open(CONFIG_PATH, "w") as file:
-            json.dump(config, file, indent=4)
-        print("Tokens saved successfully!")
+        self.config.twitch_oauth_token = self.oauth_token
+        self.config.twitch_refresh_token = self.refresh_token
+        self.config.save_config()
 
     def stop_server(self):
         """
