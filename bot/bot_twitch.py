@@ -91,6 +91,32 @@ class TwitchBot(commands.Bot):
         else:
             await ctx.send(f"@{username}, you're not in the queue!")
 
+    @commands.command(name="queue")
+    async def print_queue(self, ctx):
+        """
+        Command to show the next 9 viewers and how many remaining people are in the queue.
+        """
+        username = ctx.author.name
+        queue = self.queue_manager.get_queue()
+
+        if not queue:
+            await ctx.send("The queue is currently empty.")
+            return
+
+        max_display = 9
+        display_queue = [entry[0] for entry in queue[:max_display]]
+        queue_message = ", ".join(display_queue)
+
+        # Check if there are more people in the queue
+        remaining = len(queue) - len(display_queue)
+
+        if remaining > 0:
+            await ctx.send(f"@{username}, Next in queue: {queue_message} (+{remaining} more)")
+        else:
+            await ctx.send(f"@{username},Next in queue: {queue_message}")
+
+
+
     def get_sub_tier(self, user):
         """
         Determine and return the subscription tier for a user.
