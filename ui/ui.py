@@ -7,6 +7,7 @@ from PyQt6.QtGui import QPixmap, QColor, QPainter
 from .controller import QueueController
 
 from ui.toggleButton import ToggleSwitch
+from ui.options_ui import OptionsWindow
 
 class UI(QWidget):
     def __init__(self, controller: QueueController, config):
@@ -41,10 +42,17 @@ class UI(QWidget):
         self.twitch_auth_button.setToolTip("Click to authorize Twitch")
         self.twitch_auth_button.clicked.connect(self.authorize_twitch)
 
+        # Set up the option button to open option window
+        self.options_button = QPushButton("⚙")
+        self.options_button.setToolTip("Options")
+        self.options_button.setFixedSize(40,40)
+        self.options_button.clicked.connect(self.open_options_window)
+
         # Set up the ui above the lists
         status_layout.addWidget(self.status_icon)
         status_layout.addWidget(self.status_label)
         status_layout.addWidget(self.twitch_auth_button)
+        status_layout.addWidget(self.options_button)
 
         # Toggle layout for closing the queue
         toggle_layout = QHBoxLayout()
@@ -228,6 +236,10 @@ class UI(QWidget):
         """
         self.status_label.setText(message)
 
+    def open_options_window(self):
+        self.options_window = OptionsWindow(self.config)
+        self.options_window.show()
+
     def get_styles(self):
         """
         Return the UI stylesheet.
@@ -277,9 +289,10 @@ class UI(QWidget):
             }
             QPushButton {
                 background: #5865f2;
+                height: 40px;
+                width: 40px;
                 color: #E9E9E9; 
                 border: none;
-                padding: 6px 12px;
                 border-radius: 4px;
                 font-size: 16px;
             }
