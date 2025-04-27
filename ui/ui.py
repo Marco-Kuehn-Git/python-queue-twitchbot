@@ -12,6 +12,9 @@ from ui.options_ui import OptionsWindow
 class UI(QWidget):
     def __init__(self, controller: QueueController, config):
         super().__init__()
+        self.setWindowTitle("Queue Manager")
+        self.setGeometry(100, 60, 1100, 700)
+
         self.config = config
         self.controller = controller
         self.controller.queue_updated.connect(self.refresh_queue)
@@ -19,12 +22,10 @@ class UI(QWidget):
         self.controller.connection_status.connect(self.update_status_icon)
         self.controller.status_message.connect(self.update_status_text)
 
-        self.setWindowTitle("Queue Manager")
-        self.setGeometry(100, 60, 1100, 700)
-        self._setup_ui()
+        self.__setup_ui()
         self.setStyleSheet(self.get_styles())
 
-    def _setup_ui(self):
+    def __setup_ui(self):
         """
         Initialize the UI
         """

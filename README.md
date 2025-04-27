@@ -77,7 +77,7 @@ Features listed are in no particular order:
          "chat:edit"
      ],
      "twitch_channel": "",
-     "sorting_option": 1
+     "sorting_option": 0
    }
    ```
 

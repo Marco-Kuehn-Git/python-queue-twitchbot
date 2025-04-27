@@ -11,9 +11,9 @@ class OptionsWindow(QDialog):
         self.config = config
         self.setWindowTitle("Options")
         self.setFixedSize(700, 500)
+
         self._input_width = 400
         self._header_sep_spacing = 10
-
         dir = os.path.dirname(__file__)
         self.icon_show = QIcon(os.path.join(dir, "assets/visibility_on.svg"))
         self.icon_hide = QIcon(os.path.join(dir, "assets/visibility_off.svg"))
@@ -27,10 +27,10 @@ class OptionsWindow(QDialog):
             "Client Secret": "twitch_client_secret"
         }
 
-        self._setup_ui()
+        self.__setup_ui()
         self.setStyleSheet(self.get_styles())
 
-    def _setup_ui(self):
+    def __setup_ui(self):
         """
         Initialize the UI
         """
@@ -68,10 +68,15 @@ class OptionsWindow(QDialog):
 
         # Sort options dropdown
         sort_layout = QHBoxLayout()
-        sort_layout.addStretch()
         sort_label = QLabel("Sort option:")
         self.sort_combo = QComboBox()
-        self.sort_combo.addItems(["Option 1", "Option 2", "Option 3", "Option 4"])
+        self.sort_combo.addItems([
+            "Times queued, Sub Tier",
+            "Sub tier",
+            "Times queued",
+            "Time joined"
+        ])
+        self.sort_combo.setFixedWidth(300)
         sort_layout.addWidget(sort_label)
         sort_layout.addStretch()
         sort_layout.addWidget(self.sort_combo)
@@ -142,6 +147,7 @@ class OptionsWindow(QDialog):
         """Updated the config class with new values and saves them to the config file"""
         # Update Twitch channel
         self.config.twitch_channel = self.twitch_channel_input.text()
+        self.config.sorting_option = self.sort_combo.currentIndex()
 
         # Update twitch credentials
         for label, line_edit in self.credentials.items():

@@ -2,9 +2,10 @@ class QueueManager:
     """
     Manages the viewer queue and selected lists.
     """
-    def __init__(self):
+    def __init__(self, config):
         self.queue = []
         self.selected = []
+        self.config = config
 
     def add_user(self, username, sub_tier, times_queued, join_time):
         """
@@ -39,11 +40,24 @@ class QueueManager:
 
     def sort_queue(self):
         """
-        Sorts the queue based on:
-          - times queued (ascending),
-          - subscriber tier (descending),
-          - join time (ascending).
+        Sorts the queue based on the current sort option from the config.
         """
+        sort_option = self.config.sorting_option
+
+        match sort_option:
+            case 0:
+                self.__sort_by_times_queued_subtier()
+            case 1:
+                self.__sort_by_subtier()
+            case 2:
+                self.__sort_by_times_queued()
+            case 3:
+                self.__sort_by_join_time()
+            case _:
+                # Fallback: default to original
+                self.__sort_by_times_queued_subtier()
+
+    def sort_queue(self):
         self.queue.sort(key=lambda x: (x[2], -x[1], x[3]))
 
     def move_to_selected(self, username):
@@ -82,3 +96,35 @@ class QueueManager:
         Returns the current selected list.
         """
         return self.selected
+    
+    def __sort_by_times_queued_subtier(self):
+        """
+        Sorts the queue based on:
+          - times queued (ascending),
+          - subscriber tier (descending),
+          - join time (ascending).
+        """
+        self.queue.sort(key=lambda x: (x[2], -x[1], x[3]))
+
+    def __sort_by_subtier(self):
+        """
+        Sorts the queue based on:
+          - subscriber tier (descending),
+          - join time (ascending).
+        """
+        self.queue.sort(key=lambda x: (-x[1], x[3]))
+
+    def __sort_by_times_queued(self):
+        """
+        Sorts the queue based on:
+          - times queued (ascending),
+          - join time (ascending).
+        """
+        self.queue.sort(key=lambda x: (x[2], x[3]))
+
+    def __sort_by_join_time(self):
+        """
+        Sorts the queue based on:
+          - join time (ascending).
+        """
+        self.queue.sort(key=lambda x: x[3])
