@@ -57,9 +57,6 @@ class QueueManager:
                 # Fallback: default to original
                 self.__sort_by_times_queued_subtier()
 
-    def sort_queue(self):
-        self.queue.sort(key=lambda x: (x[2], -x[1], x[3]))
-
     def move_to_selected(self, username):
         """
         Moves a user from the queue to the selected list.
