@@ -18,6 +18,15 @@ class OptionsWindow(QDialog):
         self.icon_show = QIcon(os.path.join(dir, "assets/visibility_on.svg"))
         self.icon_hide = QIcon(os.path.join(dir, "assets/visibility_off.svg"))
 
+        # Map display label to actual config attribute names
+        self.twitch_cred_labels = ["Oauth token", "Refresh token", "Client ID", "Client Secret"]
+        self.twitch_config_map = {
+            "Oauth token": "twitch_oauth_token",
+            "Refresh token": "twitch_refresh_token",
+            "Client ID": "twitch_client_id",
+            "Client Secret": "twitch_client_secret"
+        }
+
         self._setup_ui()
         self.setStyleSheet(self.get_styles())
 
@@ -29,8 +38,10 @@ class OptionsWindow(QDialog):
 
         # Authorization buttons
         auth_layout = QHBoxLayout()
-        self.twitch_button = QPushButton("Connect Twitch")
+        self.twitch_button = QPushButton("Authorize Twitch")
+        self.twitch_button.setToolTip("Click to authorize Twitch")
         self.twitch_button.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        self.twitch_button.clicked.connect(self.authorize_twitch)
         auth_layout.addWidget(self.twitch_button, 1)
         main_layout.addLayout(auth_layout)
 
@@ -78,17 +89,8 @@ class OptionsWindow(QDialog):
 
         # Credentials inputs
         self.credentials = {}
-        creds = ["Oauth token", "Refresh token", "Client ID", "Client Secret"]
 
-        # Map display label to actual config attribute names
-        config_map = {
-            "Oauth token": "twitch_oauth_token",
-            "Refresh token": "twitch_refresh_token",
-            "Client ID": "twitch_client_id",
-            "Client Secret": "twitch_client_secret"
-        }
-
-        for label_text in creds:
+        for label_text in self.twitch_cred_labels:
             row = QHBoxLayout()
             label = QLabel(f"{label_text}:")
             edit = QLineEdit()
@@ -96,7 +98,7 @@ class OptionsWindow(QDialog):
             edit.setFixedWidth(self._input_width)
 
             # Pull value from config
-            config_attr = config_map.get(label_text)
+            config_attr = self.twitch_config_map.get(label_text)
             if config_attr and hasattr(self.config, config_attr):
                 edit.setText(getattr(self.config, config_attr) or "")
 
@@ -118,9 +120,10 @@ class OptionsWindow(QDialog):
         bottom_layout = QHBoxLayout()
         bottom_layout.addStretch()
         self.save_button = QPushButton("Save")
-        self.back_button = QPushButton("Back")
-        self.back_button.clicked.connect(self.close)
-        bottom_layout.addWidget(self.back_button)
+        self.close_button = QPushButton("Close")
+        self.save_button.clicked.connect(lambda: self.save())
+        self.close_button.clicked.connect(self.close)
+        bottom_layout.addWidget(self.close_button)
         bottom_layout.addWidget(self.save_button)
         main_layout.addLayout(bottom_layout)
 
@@ -134,6 +137,35 @@ class OptionsWindow(QDialog):
         else:
             edit.setEchoMode(QLineEdit.EchoMode.Password)
             action.setIcon(self.icon_show)
+
+    def save(self):
+        """Updated the config class with new values and saves them to the config file"""
+        # Update Twitch channel
+        self.config.twitch_channel = self.twitch_channel_input.text()
+
+        # Update twitch credentials
+        for label, line_edit in self.credentials.items():
+            text = line_edit.text()
+            config_attr = self.twitch_config_map.get(label)
+            if config_attr:
+                setattr(self.config, config_attr, text)
+
+        self.config.save_config()
+
+    def authorize_twitch(self):
+        """
+        Initiate Twitch authorization in a separate thread.
+        """
+        import threading
+        from bot.twitch_auth import TwitchAuthHandler
+
+        def auth_thread():
+            print("Starting Twitch authorization via UI button...")
+            auth_handler = TwitchAuthHandler(self.config)
+            auth_handler.start_auth() 
+
+        threading.Thread(target=auth_thread, daemon=True).start()
+
 
     def get_styles(self):
         """
