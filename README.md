@@ -36,16 +36,14 @@ Features listed are in no particular order:
      - **Client Type**: "Confidential"
    - Click "Create"
 
-3. **Add Your Client ID and Secret to `config.json`**
+3. **Set Your Client ID, Secret and Twitch Channel**
    - Go to the "Applications" tab and click "Manage" on your application
    - Find your **Client ID** at the bottom of the page
    - Click "Generate New Secret" to get your **Client Secret** (__DO NOT SHARE THIS!__)
    - Set both values in your settings
+   - Also in the settings, set your Twitch channel name.
 
-4. **Add Your Twitch Channel**
-   - Also in you settings, set your Twitch channel name.
-
-5. **Run the Application**
+4. **Run the Application**
    - On your first start, open the settings and authorize a Twitch account with the **Authorize Twitch** Button.
    - Any Twitch account can be used, but the account used will send confirmation messages for joining and leaving the queue.
 
@@ -83,7 +81,7 @@ Features listed are in no particular order:
    }
    ```
 
-4. **Follow Steps 2-4 from the User Installation**
+4. **Follow Steps 2 adn 3 from the User Installation**
 
 5. **Run the Bot**
    ```sh
