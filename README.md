@@ -40,31 +40,16 @@ Features listed are in no particular order:
    - Go to the "Applications" tab and click "Manage" on your application
    - Find your **Client ID** at the bottom of the page
    - Click "Generate New Secret" to get your **Client Secret** (__DO NOT SHARE THIS!__)
-   - Save both values in your `config.json` file:
-
-   ```json
-   {
-     "twitch_oauth_token": "",
-     "twitch_refresh_token": "",
-     "twitch_client_id": "YOUR_CLIENT_ID",
-     "twitch_client_secret": "YOUR_CLIENT_SECRET",
-     "twitch_app_redirect_uri": "http://localhost:8080",
-     "twitch_scopes": [
-         "chat:read",
-         "chat:edit"
-     ],
-     "twitch_channel": "YOUR_TWITCH_CHANNEL"
-   }
-   ```
+   - Set both values in your settings
 
 4. **Add Your Twitch Channel**
-   - Inside `config.json`, replace `your_twitch_channel` with your actual Twitch channel name.
+   - Also in you settings, set your Twitch channel name.
 
 5. **Run the Application**
-   - On your first start, you need to authorize a Twitch account with the **Authorize Twitch** Button.
+   - On your first start, open the settings and authorize a Twitch account with the **Authorize Twitch** Button.
    - Any Twitch account can be used, but the account used will send confirmation messages for joining and leaving the queue.
 
-> **Note:** If prompted by the firewall, click "Allow." Then restart the authorization process. The bot temporarily starts a local server to retrieve authentication data and closes it afterward.
+> **Note:** If prompted by the firewall, click "Allow." Then restart the authorization process. The app temporarily starts a local server to retrieve the authentication data and closes it afterward.
 
 ---
 
@@ -86,14 +71,15 @@ Features listed are in no particular order:
    {
      "twitch_oauth_token": "",
      "twitch_refresh_token": "",
-     "twitch_client_id": "YOUR_CLIENT_ID",
-     "twitch_client_secret": "YOUR_CLIENT_SECRET",
+     "twitch_client_id": "",
+     "twitch_client_secret": "",
      "twitch_app_redirect_uri": "http://localhost:8080",
      "twitch_scopes": [
          "chat:read",
          "chat:edit"
      ],
-     "twitch_channel": "YOUR_TWITCH_CHANNEL"
+     "twitch_channel": "",
+     "sorting_option": 1
    }
    ```
 
