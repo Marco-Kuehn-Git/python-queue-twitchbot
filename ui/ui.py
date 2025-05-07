@@ -22,10 +22,10 @@ class UI(QWidget):
         self.controller.connection_status.connect(self.update_status_icon)
         self.controller.status_message.connect(self.update_status_text)
 
-        self.__setup_ui()
-        self.setStyleSheet(self.get_styles())
+        self._setup_ui()
+        self.setStyleSheet(self._get_styles())
 
-    def __setup_ui(self):
+    def _setup_ui(self):
         """
         Initialize the UI
         """
@@ -218,10 +218,10 @@ class UI(QWidget):
         self.status_label.setText(message)
 
     def open_options_window(self):
-        self.options_window = OptionsWindow(self.config)
+        self.options_window = OptionsWindow(self.config, self.controller)
         self.options_window.show()
 
-    def get_styles(self):
+    def _get_styles(self):
         """
         Return the UI stylesheet.
         """

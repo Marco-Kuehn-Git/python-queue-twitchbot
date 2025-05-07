@@ -6,11 +6,13 @@ from PyQt6.QtGui import QIcon, QAction
 import functools, os
 
 class OptionsWindow(QDialog):
-    def __init__(self, config, parent=None):
+    def __init__(self, config, controller, parent=None):
         super().__init__(parent)
-        self.config = config
         self.setWindowTitle("Options")
         self.setFixedSize(700, 500)
+
+        self.config = config
+        self.controller = controller
 
         self._input_width = 400
         self._header_sep_spacing = 10
@@ -27,10 +29,10 @@ class OptionsWindow(QDialog):
             "Client Secret": "twitch_client_secret"
         }
 
-        self.__setup_ui()
-        self.setStyleSheet(self.get_styles())
+        self._setup_ui()
+        self.setStyleSheet(self._get_styles())
 
-    def __setup_ui(self):
+    def _setup_ui(self):
         """
         Initialize the UI
         """
@@ -48,6 +50,7 @@ class OptionsWindow(QDialog):
         # General options header and separator
         main_layout.addSpacing(self._header_sep_spacing)
         general_label = QLabel("General options")
+        general_label.setObjectName("headerLabel")
         main_layout.addWidget(general_label)
         sep_general = QFrame()
         sep_general.setObjectName("sepGeneral")
@@ -77,6 +80,7 @@ class OptionsWindow(QDialog):
             "Time joined"
         ])
         self.sort_combo.setFixedWidth(300)
+        self.sort_combo.setCurrentIndex(self.config.sorting_option or 0)
         sort_layout.addWidget(sort_label)
         sort_layout.addStretch()
         sort_layout.addWidget(self.sort_combo)
@@ -85,6 +89,7 @@ class OptionsWindow(QDialog):
         # Twitch credentials header and separator
         main_layout.addSpacing(self._header_sep_spacing)
         creds_label = QLabel("Twitch credentials")
+        creds_label.setObjectName("headerLabel")
         main_layout.addWidget(creds_label)
         sep_creds = QFrame()
         sep_creds.setObjectName("sepCreds")
@@ -156,24 +161,78 @@ class OptionsWindow(QDialog):
             if config_attr:
                 setattr(self.config, config_attr, text)
 
+        # Resort queue and refresh UI
+        self.controller.queue_manager.sort_queue()
+        self.controller.update_ui()
         self.config.save_config()
 
     def authorize_twitch(self):
         """
-        Initiate Twitch authorization in a separate thread.
+        Initiate Twitch authorization.
         """
+        if not self.validate_required_fields():
+            print("Missing required fields. Please fill them in before authorizing.")
+            return
+
         import threading
         from bot.twitch_auth import TwitchAuthHandler
 
         def auth_thread():
-            print("Starting Twitch authorization via UI button...")
             auth_handler = TwitchAuthHandler(self.config)
-            auth_handler.start_auth() 
+            auth_handler.start_auth()
+
+            # Reload config values
+            self.config = self.config.__class__()
+            self.update_fields()
 
         threading.Thread(target=auth_thread, daemon=True).start()
+    
+    def validate_required_fields(self):
+        """
+        Check if required fields for Twitch authorization are set.
+        Highlights missing fields with red border.
+        Returns True if all required fields are valid, else False.
+        """
+        valid = True
 
+        # Fields to check
+        required_fields = {
+            "Client ID": self.credentials["Client ID"],
+            "Client Secret": self.credentials["Client Secret"],
+            "Twitch Channel": self.twitch_channel_input
+        }
 
-    def get_styles(self):
+        for label, field in required_fields.items():
+            if not field.text().strip():
+                # Mark field as invalid
+                field.setStyleSheet("border: 2px solid red;")
+                valid = False
+            else:
+                # Reset style if filled
+                field.setStyleSheet("")
+
+        return valid
+
+    def update_fields(self):
+        """
+        Update UI fields to match the current config values.
+        """
+        # Update Twitch Channel
+        self.twitch_channel_input.setText(self.config.twitch_channel or "")
+
+        # Update Sort Option
+        print("Current index before: ", self.sort_combo.currentIndex())
+        print("Saved index: ", self.config.sorting_option)
+        self.sort_combo.setCurrentIndex(self.config.sorting_option or 0)
+        print("Current index after: ", self.sort_combo.currentIndex())
+
+        # Update Credentials
+        for label_text, line_edit in self.credentials.items():
+            config_attr = self.twitch_config_map.get(label_text)
+            if config_attr and hasattr(self.config, config_attr):
+                line_edit.setText(getattr(self.config, config_attr) or "")
+
+    def _get_styles(self):
         """
         Return the UI stylesheet.
         """
@@ -186,9 +245,11 @@ class OptionsWindow(QDialog):
             }
             QLabel {
                 font-size: 16px;
-                font-weight: bold;
                 color: #E9E9E9;
             }
+            QLabel#headerLabel {
+                font-weight: bold;
+            } 
             QFrame#sepGeneral, QFrame#sepCreds {
                 background-color: #6272a4;
                 max-height: 4px;

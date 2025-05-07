@@ -46,16 +46,16 @@ class QueueManager:
 
         match sort_option:
             case 0:
-                self.__sort_by_times_queued_subtier()
+                self._sort_by_times_queued_subtier()
             case 1:
-                self.__sort_by_subtier()
+                self._sort_by_subtier()
             case 2:
-                self.__sort_by_times_queued()
+                self._sort_by_times_queued()
             case 3:
-                self.__sort_by_join_time()
+                self._sort_by_join_time()
             case _:
-                # Fallback: default to original
-                self.__sort_by_times_queued_subtier()
+                # Fallback
+                self._sort_by_join_time()
 
     def move_to_selected(self, username):
         """
@@ -94,7 +94,7 @@ class QueueManager:
         """
         return self.selected
     
-    def __sort_by_times_queued_subtier(self):
+    def _sort_by_times_queued_subtier(self):
         """
         Sorts the queue based on:
           - times queued (ascending),
@@ -103,7 +103,7 @@ class QueueManager:
         """
         self.queue.sort(key=lambda x: (x[2], -x[1], x[3]))
 
-    def __sort_by_subtier(self):
+    def _sort_by_subtier(self):
         """
         Sorts the queue based on:
           - subscriber tier (descending),
@@ -111,7 +111,7 @@ class QueueManager:
         """
         self.queue.sort(key=lambda x: (-x[1], x[3]))
 
-    def __sort_by_times_queued(self):
+    def _sort_by_times_queued(self):
         """
         Sorts the queue based on:
           - times queued (ascending),
@@ -119,7 +119,7 @@ class QueueManager:
         """
         self.queue.sort(key=lambda x: (x[2], x[3]))
 
-    def __sort_by_join_time(self):
+    def _sort_by_join_time(self):
         """
         Sorts the queue based on:
           - join time (ascending).
