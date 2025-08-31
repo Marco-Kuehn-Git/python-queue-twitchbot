@@ -3,7 +3,11 @@
 ## About the Project
 A simple self-hosted Twitch bot written in Python that allows viewers to join a queue. The streamer can manage the queue and select viewers through a UI.
 
-Viewers are sorted based on the number of times queued, subscription tier, and time joined.
+Viewers can be sorted by sorted based on:  
+- number of times queued, subscription tier, and time joined
+- subscribtion tier
+- number of times queued
+- time joined
 
 ---
 
