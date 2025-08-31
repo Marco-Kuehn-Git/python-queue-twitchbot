@@ -73,10 +73,12 @@ def start_bot_loop(controller, shared_queue_manager, config):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    # Initialize shared queue manager and controller
-    shared_queue_manager = QueueManager()
-    controller = QueueController(shared_queue_manager)
+
     config = Config()
+
+    # Initialize shared queue manager and controller
+    shared_queue_manager = QueueManager(config)
+    controller = QueueController(shared_queue_manager)
     
     # Create and display the main UI
     ui = UI(controller, config)

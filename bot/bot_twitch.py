@@ -148,7 +148,7 @@ class TwitchBot(commands.Bot):
 
             if token_error:
                 print("Detected invalid or expired token. Attempting token refresh...")
-                auth_handler = TwitchAuthHandler()
+                auth_handler = TwitchAuthHandler(self.config)
                 auth_handler.refresh_twitch_token()
 
                 # Update bots token with the refreshed token

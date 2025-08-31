@@ -1,10 +1,10 @@
-import json
 import requests
 import webbrowser
 import http.server
 import socketserver
 import threading
 from urllib.parse import urlparse, parse_qs
+from typing import Optional
 
 from helper.helper import show_popup
 
@@ -18,9 +18,9 @@ class TwitchAuthHandler:
     """
     def __init__(self, config):
         self.config = config
-        self.oauth_token = self.config.twitch_oauth_token if self.config.twitch_oauth_token else None
-        self.refresh_token = self.config.twitch_refresh_token if self.config.twitch_refresh_token else None
-        self.auth_code = None
+        self.oauth_token: Optional[str] = self.config.twitch_oauth_token if self.config.twitch_oauth_token else None
+        self.refresh_token: Optional[str] = self.config.twitch_refresh_token if self.config.twitch_refresh_token else None
+        self.auth_code: Optional[str] = None
         self.server = None
         self.auth_event = threading.Event()
 
@@ -56,21 +56,21 @@ class TwitchAuthHandler:
             def log_message(self, format, *args):
                 return
 
-            def do_GET(handler):
-                parsed_path = urlparse(handler.path)
+            def do_GET(self):
+                parsed_path = urlparse(self.path)
                 query_params = parse_qs(parsed_path.query)
                 if "code" in query_params:
                     handler_self.auth_code = query_params["code"][0]
-                    handler.send_response(200)
-                    handler.send_header("Content-type", "text/html")
-                    handler.end_headers()
-                    handler.wfile.write(b"Authorization successful. You can close this window now.")
-                    handler.wfile.flush()
+                    self.send_response(200)
+                    self.send_header("Content-type", "text/html")
+                    self.end_headers()
+                    self.wfile.write(b"Authorization successful. You can close this window now.")
+                    self.wfile.flush()
                     handler_self.auth_event.set()
                 else:
-                    handler.send_response(400)
-                    handler.end_headers()
-                    handler.wfile.write(b"Authorization failed.")
+                    self.send_response(400)
+                    self.end_headers()
+                    self.wfile.write(b"Authorization failed.")
 
         self.server = ThreadingTCPServer(("127.0.0.1", 8080), AuthHandler)
         server_thread = threading.Thread(target=self.server.serve_forever, daemon=True)

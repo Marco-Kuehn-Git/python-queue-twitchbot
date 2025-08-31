@@ -7,10 +7,14 @@ from PyQt6.QtGui import QPixmap, QColor, QPainter
 from .controller import QueueController
 
 from ui.toggleButton import ToggleSwitch
+from ui.options_ui import OptionsWindow
 
 class UI(QWidget):
     def __init__(self, controller: QueueController, config):
         super().__init__()
+        self.setWindowTitle("Queue Manager")
+        self.setGeometry(100, 60, 1100, 700)
+
         self.config = config
         self.controller = controller
         self.controller.queue_updated.connect(self.refresh_queue)
@@ -18,10 +22,8 @@ class UI(QWidget):
         self.controller.connection_status.connect(self.update_status_icon)
         self.controller.status_message.connect(self.update_status_text)
 
-        self.setWindowTitle("Queue Manager")
-        self.setGeometry(100, 60, 1100, 700)
         self._setup_ui()
-        self.setStyleSheet(self.get_styles())
+        self.setStyleSheet(self._get_styles())
 
     def _setup_ui(self):
         """
@@ -36,15 +38,16 @@ class UI(QWidget):
         self.status_icon.setFixedSize(20, 20)
         self.update_status_icon(False)
 
-        # Set up the button to connect twitch
-        self.twitch_auth_button = QPushButton("Connect Twitch")
-        self.twitch_auth_button.setToolTip("Click to authorize Twitch")
-        self.twitch_auth_button.clicked.connect(self.authorize_twitch)
+        # Set up the option button to open option window
+        self.options_button = QPushButton("⚙")
+        self.options_button.setToolTip("Options")
+        self.options_button.setFixedSize(40,40)
+        self.options_button.clicked.connect(self.open_options_window)
 
         # Set up the ui above the lists
         status_layout.addWidget(self.status_icon)
         status_layout.addWidget(self.status_label)
-        status_layout.addWidget(self.twitch_auth_button)
+        status_layout.addWidget(self.options_button)
 
         # Toggle layout for closing the queue
         toggle_layout = QHBoxLayout()
@@ -163,20 +166,6 @@ class UI(QWidget):
         self.status_icon.setPixmap(pixmap)
         self.status_label.setText(text)
 
-    def authorize_twitch(self):
-        """
-        Initiate Twitch authorization in a separate thread.
-        """
-        import threading
-        from bot.twitch_auth import TwitchAuthHandler
-
-        def auth_thread():
-            print("Starting Twitch authorization via UI button...")
-            auth_handler = TwitchAuthHandler(self.config)
-            auth_handler.start_auth() 
-
-        threading.Thread(target=auth_thread, daemon=True).start()
-
     def refresh_queue(self):
         """
         Clear and repopulate the queue list widget.
@@ -228,7 +217,11 @@ class UI(QWidget):
         """
         self.status_label.setText(message)
 
-    def get_styles(self):
+    def open_options_window(self):
+        self.options_window = OptionsWindow(self.config, self.controller)
+        self.options_window.show()
+
+    def _get_styles(self):
         """
         Return the UI stylesheet.
         """
@@ -277,9 +270,10 @@ class UI(QWidget):
             }
             QPushButton {
                 background: #5865f2;
+                height: 40px;
+                width: 40px;
                 color: #E9E9E9; 
                 border: none;
-                padding: 6px 12px;
                 border-radius: 4px;
                 font-size: 16px;
             }
