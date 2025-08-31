@@ -3,27 +3,38 @@
 ## About the Project
 A simple self-hosted Twitch bot written in Python that allows viewers to join a queue. The streamer can manage the queue and select viewers through a UI.
 
-Viewers can be sorted by sorted based on:  
-- number of times queued, subscription tier, and time joined
-- subscribtion tier
-- number of times queued
-- time joined
+Since it is self hosted, it requieres a bit of work from your end to setup, but Twitch makes it farily easy.
+
+---
+### Features:
+1. Vewers can join and leave the queue with `!join` and `!leave`.
+2. Viewers can use `!queue` to view the current queue.
+3. The app tracks how many times a viewer has played and what tier of sub they are  
+   - Times queued resets after restart.
+4. The streamer can close the queue preventng viewers from joining.
+5. You can select between the following queue order:
+   - number of times queued and subscription tier (selected by default)
+   - subscribtion tier
+   - number of times queued
+   - time joined
 
 ---
 
 ### Planned Features  
 
-Features listed are in no particular order:  
+Features listed are in no particular order and not guranteed to be implemented:  
 
 - **Persistant Queue Data** - Save current queue in case the application crashes. Option to load previous queue when starting the application.
-- **Support for Additional OS** - Make the application available on Linux and macOS.
+- **Sub only mode** - Make a setting that only allows subs to join. Maybe with minimum tier selection.
+- **Support for Additional OS** - Make the application available on Linux and macOS. Currently its only available for Windows.
+- **Add auto updates** - Give users the option to update the app without having to download the newest version here everytime.
 
 ---
 
 ## Installation (User)
 
 1. **Download and Extract**
-   - Download and extract the latest `QueueManager.zip` file from the [Releases](https://github.com/Marco-Kuehn-Git/python-queue-twitchbot/releases) section.
+   - Download and extract the latest `QueueManager.zip` file from the [Releases](https://github.com/Marco-Kuehn-Git/python-queue-twitchbot/releases).
 
 2. **Create a Twitch Application**
    - Visit the [Twitch Developer Console](https://dev.twitch.tv/console)
