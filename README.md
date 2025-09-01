@@ -57,7 +57,7 @@ Features listed are in no particular order and not guranteed to be implemented:
    - On your first start, an empty config file will be automaticly created.
    - Open the settings on the top right and set your Twitch Channel, Client Id and Secret. Then click save.
    - Now authorize a Twitch account with the **Authorize Twitch** Button.
-   - Any Twitch account can be used, but the account used will send confirmation messages for joining and leaving the queue.
+   - Any Twitch account you own can be used. The account used will send confirmation messages for joining and leaving the queue.
 
 > **Note:** If prompted by the firewall, click "Allow." Then restart the authorization process. The app temporarily starts a local server to retrieve the authentication data and closes it afterward.
 
@@ -78,8 +78,8 @@ Features listed are in no particular order and not guranteed to be implemented:
 
 3. **Follow Steps 2 and 3 from the User Installation**
 
-4. **Run the Bot**
+4. **Run the App with**
    ```sh
    python main.py
    ```
-
+   Follow step 4 of the User Installation
