@@ -1,7 +1,9 @@
 # Twitch Queue Bot
 
 ## About the Project
-A simple self-hosted Twitch bot written in Python that allows viewers to join a queue. The streamer can manage the queue and select viewers through a UI.
+A simple self-hosted Twitch bot written in Python that allows viewers to join a queue. The streamer can manage the queue and select viewers through a UI.  
+
+To handle the communications with Twitch's API, the app uses [TwitchIO](https://twitchio.dev/en/latest/), and for the UI, the app uses [PyQt6](https://pypi.org/project/PyQt6/).
 
 Since it is self hosted, it requieres a bit of work from your end to setup, but Twitch makes it farily easy.
 
