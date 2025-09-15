@@ -28,7 +28,7 @@ Features listed are in no particular order and not guranteed to be implemented:
 
 - **Persistant Queue Data** - Save current queue in case the application crashes. Option to load previous queue when starting the application.
 - **Sub only mode** - Make a setting that only allows subs to join. Maybe with minimum tier selection.
-- **Support for Additional OS** - Make the application available on Linux and macOS. Currently its only available for Windows.
+- **Support for Additional OS** - Make the application available on Linux and macOS. Currently its only available for Windows 10/11.
 - **Add auto updates** - Give users the option to update the app without having to download the newest version here everytime.
 
 ---
