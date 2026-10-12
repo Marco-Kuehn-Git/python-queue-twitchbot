@@ -29,7 +29,6 @@ class TwitchAuthHandler:
         Starts the Twitch authorization process by opening the auth URL,
         starting a local server to capture the response, and exchanging the auth code for tokens.
         """
-        print("Starting Twitch authorization...")
         auth_url = (
             f"https://id.twitch.tv/oauth2/authorize?"
             f"client_id={self.config.twitch_client_id}&"
@@ -40,7 +39,6 @@ class TwitchAuthHandler:
         webbrowser.open(auth_url)
         self.start_local_server()
         
-        print("Waiting for Twitch authorization...")
         self.auth_event.wait()
         self.exchange_code_for_token()
         self.stop_server()
@@ -94,12 +92,10 @@ class TwitchAuthHandler:
         if "access_token" in token_data:
             self.oauth_token = token_data["access_token"]
             self.refresh_token = token_data["refresh_token"]
-            print("Twitch authentication successful!")
             self.save_tokens()
         else:
             show_popup("error", "Error exchanging code for token",
                        "Error during token exchange:\n" + str(token_data))
-            print("Error exchanging code for token:", token_data)
             exit(1)
 
     def refresh_twitch_token(self):
@@ -120,12 +116,10 @@ class TwitchAuthHandler:
             self.oauth_token = token_data["access_token"]
             self.refresh_token = token_data.get("refresh_token", self.refresh_token)
             self.save_tokens()
-            print("Token refresh successful!")
             return self.oauth_token
         else:
             show_popup("error", "Error refreshing token",
                        "Error during token refresh:\n" + str(token_data))
-            print("Failed to refresh token:", token_data)
             exit(1)
 
     def save_tokens(self):

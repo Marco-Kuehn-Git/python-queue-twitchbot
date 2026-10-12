@@ -24,14 +24,12 @@ class TwitchBot(commands.Bot):
         """
         Called when the bot is ready. Emits connection status.
         """
-        print(f"Bot is online as {self.nick}")
         self.controller.connection_status.emit(True)
 
     async def event_disconnect(self):
         """
         Called when the bot disconnects. Emits disconnection status and shows a popup.
         """
-        print("Bot disconnected!")
         self.controller.connection_status.emit(False)
         show_popup("warning", "Bot disconnected!", "The bot got disconnected from Twitch")
 
@@ -126,7 +124,6 @@ class TwitchBot(commands.Bot):
             # Ensuring the minium of 1 is needed to properly display tier 1 subscribers
             sub_tier_unclean = int(user.badges.get("subscriber"))
             sub_tier_clean = max(sub_tier_unclean // 1000, 1)
-            print("Unclean sub tier:", sub_tier_unclean, "Clean sub tier:", sub_tier_clean)
             return sub_tier_clean
         else:
             return 0
@@ -147,14 +144,12 @@ class TwitchBot(commands.Bot):
                 token_error = True
 
             if token_error:
-                print("Detected invalid or expired token. Attempting token refresh...")
                 auth_handler = TwitchAuthHandler(self.config)
                 auth_handler.refresh_twitch_token()
 
                 # Update bots token with the refreshed token
                 self._http.token = auth_handler.oauth_token
                 self.token = auth_handler.oauth_token
-                print("Token refreshed successfully.")
 
                 # Signal that the bot should restart
                 self.should_restart = True

@@ -17,8 +17,7 @@ def can_connect_with_token(token, config):
     try:
         response = requests.get("https://api.twitch.tv/helix/users", headers=headers, timeout=5)
         return response.status_code == 200
-    except Exception as e:
-        print("Error testing token connectivity:", e)
+    except Exception:
         return False
 
 def show_popup(type, title, message):
